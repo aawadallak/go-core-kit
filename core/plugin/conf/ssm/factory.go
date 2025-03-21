@@ -48,8 +48,8 @@ func (p *provider) Scan(fn conf.ScanFunc) {
 	}
 }
 
-// Pull fetches parameters from SSM and updates the local data store
-func (p *provider) Pull(ctx context.Context, others []conf.Provider) error {
+// Load fetches parameters from SSM and updates the local data store
+func (p *provider) Load(ctx context.Context, others []conf.Provider) error {
 	parameters := findSSMParameterReferences(others)
 	if len(parameters) == 0 {
 		return nil

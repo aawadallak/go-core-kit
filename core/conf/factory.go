@@ -112,7 +112,7 @@ func Init(ctx context.Context, opts ...Option) error {
 
 	// Process each loader using the providers slice
 	for _, provider := range cfg.providers {
-		if err := provider.Pull(ctx, providers); err != nil {
+		if err := provider.Load(ctx, providers); err != nil {
 			return fmt.Errorf("failed to pull provider: %w", err)
 		}
 	}

@@ -45,10 +45,10 @@ type ValueMap interface {
 // Provider defines the interface for configuration providers.
 // A provider is responsible for pulling and looking up configuration values.
 type Provider interface {
-	// Pull retrieves configuration values from the provider.
+	// Load retrieves configuration values from the provider.
 	// The others parameter contains other providers that may be used for dependency resolution.
 	// Returns an error if the pull operation fails.
-	Pull(ctx context.Context, others []Provider) error
+	Load(ctx context.Context, others []Provider) error
 
 	// Lookup retrieves a configuration value for the given key.
 	// Returns the value and a boolean indicating if the key was found.

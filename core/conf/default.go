@@ -26,9 +26,9 @@ func (d *defaultProvider) Scan(fn ScanFunc) {
 	}
 }
 
-// Pull is a no-op for the default provider since environment variables
+// Load is a no-op for the default provider since environment variables
 // are always available at runtime.
-func (d *defaultProvider) Pull(ctx context.Context, providers []Provider) error {
+func (d *defaultProvider) Load(ctx context.Context, providers []Provider) error {
 	// We don't need to pull because
 	// env variables are always available
 	return nil

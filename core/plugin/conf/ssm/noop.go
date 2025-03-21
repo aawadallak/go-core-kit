@@ -18,6 +18,6 @@ func (p *noopProvider) Lookup(key string) (string, bool) {
 
 func (p *noopProvider) Scan(fn conf.ScanFunc) {}
 
-func (p *noopProvider) Pull(ctx context.Context, others []conf.Provider) error {
+func (p *noopProvider) Load(ctx context.Context, others []conf.Provider) error {
 	return nil
 }
