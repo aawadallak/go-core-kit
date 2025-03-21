@@ -47,7 +47,7 @@ type ValueMap interface {
 type Provider interface {
 	// Load retrieves configuration values from the provider.
 	// The others parameter contains other providers that may be used for dependency resolution.
-	// Returns an error if the pull operation fails.
+	// Returns an error if the load operation fails.
 	Load(ctx context.Context, others []Provider) error
 
 	// Lookup retrieves a configuration value for the given key.
