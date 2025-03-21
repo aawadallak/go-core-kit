@@ -12,15 +12,6 @@ type cacheProvider struct {
 	client  *redis.Client
 }
 
-// Close implements cache.Provider.
-func (c *cacheProvider) Close(_ context.Context) error {
-	if c.client == nil {
-		return nil
-	}
-
-	return c.client.Close()
-}
-
 var _ cache.Provider = (*cacheProvider)(nil)
 
 func (c *cacheProvider) Get(ctx context.Context, key string) ([]byte, error) {
@@ -49,6 +40,15 @@ func (c *cacheProvider) Delete(ctx context.Context, key string) error {
 		return cache.ErrKeyNotFound
 	}
 	return cmd.Err()
+}
+
+// Close implements cache.Provider.
+func (c *cacheProvider) Close(_ context.Context) error {
+	if c.client == nil {
+		return nil
+	}
+
+	return c.client.Close()
 }
 
 // NewRedisProvider returns a new Redis cache provider with the specified options.
