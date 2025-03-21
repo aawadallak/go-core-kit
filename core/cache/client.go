@@ -9,11 +9,16 @@ type cache struct {
 	provider Provider
 	options  *options
 	mu       sync.RWMutex
+	isClosed bool
 }
 
 var _ Cache = (*cache)(nil)
 
 func (c *cache) Get(ctx context.Context, key string) (Item, error) {
+	if c.isClosed {
+		return Item{}, ErrClosed
+	}
+
 	if c.options.useMutex {
 		c.mu.RLock()
 		defer c.mu.RUnlock()
@@ -36,6 +41,10 @@ func (c *cache) Get(ctx context.Context, key string) (Item, error) {
 }
 
 func (c *cache) Set(ctx context.Context, item Item) error {
+	if c.isClosed {
+		return ErrClosed
+	}
+
 	if c.options.useMutex {
 		c.mu.Lock()
 		defer c.mu.Unlock()
@@ -60,6 +69,10 @@ func (c *cache) Set(ctx context.Context, item Item) error {
 }
 
 func (c *cache) Delete(ctx context.Context, key string) error {
+	if c.isClosed {
+		return ErrClosed
+	}
+
 	if c.options.useMutex {
 		c.mu.Lock()
 		defer c.mu.Unlock()
@@ -78,7 +91,16 @@ func (c *cache) Close(ctx context.Context) error {
 		defer c.mu.Unlock()
 	}
 
-	return c.provider.Close(ctx)
+	if c.isClosed {
+		return nil
+	}
+
+	if err := c.provider.Close(ctx); err != nil {
+		return err
+	}
+
+	c.isClosed = true
+	return nil
 }
 
 // NewCache creates a new cache instance with the specified provider and options.

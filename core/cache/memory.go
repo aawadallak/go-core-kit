@@ -36,6 +36,11 @@ func (i *inMemoryCache) Set(ctx context.Context, item Item) error {
 func (i *inMemoryCache) Get(ctx context.Context, key string) ([]byte, error) {
 	i.mu.RLock()
 	defer i.mu.RUnlock()
+
+	if i.isClosed {
+		return nil, ErrClosed
+	}
+
 	item, ok := i.data[key]
 	if !ok {
 		return nil, ErrKeyNotFound
@@ -64,6 +69,10 @@ func (i *inMemoryCache) Delete(ctx context.Context, key string) error {
 func (i *inMemoryCache) Close(ctx context.Context) error {
 	i.mu.Lock()
 	defer i.mu.Unlock()
+
+	if i.isClosed {
+		return nil
+	}
 
 	i.isClosed = true
 	return nil
