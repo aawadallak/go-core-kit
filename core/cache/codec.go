@@ -4,16 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
-	"errors"
 	"io"
-)
-
-var (
-	// ErrInvalidTargetType is returned when the target type is not compatible with the decoder
-	ErrInvalidTargetType = errors.New("target must be a byte slice for pure gzip decoding")
-
-	// ErrInvalidPayloadType is returned when the payload type is not compatible with the encoder
-	ErrInvalidPayloadType = errors.New("payload must be a byte slice for pure gzip encoding")
 )
 
 // Decoder is a function type that decodes a byte payload into a target value.

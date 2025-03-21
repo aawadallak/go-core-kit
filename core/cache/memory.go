@@ -3,12 +3,9 @@ package cache
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"sync"
 	"time"
 )
-
-var ErrClosed = errors.New("cache is closed")
 
 type inMemoryCache struct {
 	data     map[string]Item

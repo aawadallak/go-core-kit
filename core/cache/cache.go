@@ -2,7 +2,6 @@ package cache
 
 import (
 	"context"
-	"errors"
 	"time"
 )
 
@@ -10,14 +9,6 @@ var (
 	// DefaultExpiration is the default duration for items stored in
 	// the cache to expire.
 	DefaultExpiration time.Duration = 0
-
-	// ErrKeyNotFound is returned in Cache.Get and Cache.Delete when the
-	// provided key could not be found in cache.
-	ErrKeyNotFound error = errors.New("key not found in cache")
-
-	// ErrInvalidCachedValue is returned when the cached value cannot be decoded
-	// into the expected type.
-	ErrInvalidCachedValue error = errors.New("invalid cached value")
 )
 
 // Cache represents a cache interface, which is used to store and retrieve items.
