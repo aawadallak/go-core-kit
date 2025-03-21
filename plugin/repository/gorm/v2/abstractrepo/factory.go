@@ -112,51 +112,49 @@ func setupUUIDHooks[T any](db *gorm.DB) {
 }
 
 func NewAbstractPaginatedRepository[T, E any](
-	db *gorm.DB, opts ...Option) *AbstractPaginatedRepository[T, E] {
+	db *gorm.DB, opts ...Option) (*AbstractPaginatedRepository[T, E], error) {
 	options := &options{}
 
 	for _, opt := range opts {
 		opt(options)
 	}
 
-	repo := &AbstractPaginatedRepository[T, E]{
+	instance := &AbstractPaginatedRepository[T, E]{
 		db:   db,
 		opts: *options,
 	}
 
 	if err := applyIndexes[T](db, *options); err != nil {
-		// Log the error but don't fail repository creation
-		fmt.Printf("Warning: Failed to apply indexes: %v\n", err)
+		return nil, fmt.Errorf("failed to apply indexes: %w", err)
 	}
 
 	if options.UseUUID {
 		setupUUIDHooks[T](db)
 	}
 
-	return repo
+	return instance, nil
 }
 
 func NewAbstractRepository[T any](
-	db *gorm.DB, opts ...Option) *AbstractRepository[T] {
+	db *gorm.DB, opts ...Option) (*AbstractRepository[T], error) {
 	options := &options{}
 
 	for _, opt := range opts {
 		opt(options)
 	}
 
-	repo := &AbstractRepository[T]{
+	instance := &AbstractRepository[T]{
 		db:   db,
 		opts: *options,
 	}
 
 	if err := applyIndexes[T](db, *options); err != nil {
-		// Log the error but don't fail repository creation
-		fmt.Printf("Warning: Failed to apply indexes: %v\n", err)
+		return nil, fmt.Errorf("failed to apply indexes: %w", err)
 	}
 
 	if options.UseUUID {
 		setupUUIDHooks[T](db)
 	}
 
-	return repo
+	return instance, nil
 }
