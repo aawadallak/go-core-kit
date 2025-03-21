@@ -3,7 +3,6 @@ package abstractrepo
 import (
 	"fmt"
 	"reflect"
-	"strings"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -85,25 +84,6 @@ func applyIndexes[T any](db *gorm.DB, opts options) error {
 		// Create the index using GORM's migrator
 		if err := db.Migrator().CreateIndex(new(T), idx.Name); err != nil {
 			return fmt.Errorf("failed to create index %s: %w", idx.Name, err)
-		}
-
-		// If it's a unique index, we need to modify it to be unique
-		if idx.Type == "unique" {
-			if err := db.Migrator().DropIndex(new(T), idx.Name); err != nil {
-				return fmt.Errorf("failed to drop index %s for unique conversion: %w", idx.Name, err)
-			}
-			// Create a unique index by adding a unique constraint
-			if err := db.Migrator().CreateIndex(new(T), idx.Name+"_unique"); err != nil {
-				return fmt.Errorf("failed to create unique index %s: %w", idx.Name, err)
-			}
-			// Add unique constraint using GORM's raw SQL
-			var tableName string
-			if err := db.Raw("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?", db.Migrator().CurrentDatabase()).Scan(&tableName).Error; err != nil {
-				return fmt.Errorf("failed to get table name: %w", err)
-			}
-			if err := db.Exec("ALTER TABLE " + tableName + " ADD UNIQUE INDEX " + idx.Name + " (" + strings.Join(idx.Fields, ", ") + ")").Error; err != nil {
-				return fmt.Errorf("failed to add unique constraint to index %s: %w", idx.Name, err)
-			}
 		}
 	}
 
