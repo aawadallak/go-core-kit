@@ -5,7 +5,9 @@ import (
 	"errors"
 
 	"github.com/aawadallak/go-core-kit/core/idempotent"
+	"github.com/aawadallak/go-core-kit/plugin/repository/gorm/v2/abstractrepo"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 var (
@@ -80,9 +82,15 @@ func (i *Repository) Find(ctx context.Context, key string) (*idempotent.EventIte
 		return nil, ErrKeyRequired
 	}
 
+	tx, err := abstractrepo.FromContext(ctx)
+	if err != nil {
+		tx = i.db
+	}
+
 	out := &Entity{}
-	if err := i.db.
+	if err := tx.
 		WithContext(ctx).
+		Clauses(clause.Locking{Strength: "UPDATE"}).
 		Where("key = ?", key).
 		First(out).
 		Error; err != nil {
