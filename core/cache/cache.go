@@ -17,9 +17,10 @@ type Cache interface {
 	// The item is associated with the given key and can be retrieved using the same key.
 	Set(ctx context.Context, item Item) error
 
-	// Get retrieves an item from the cache.
-	// The item is identified by the given key and can be retrieved using the same key.
-	Get(ctx context.Context, key string) (Item, error)
+	// GetRaw retrieves the raw bytes of an item from the cache.
+	GetRaw(ctx context.Context, key string) ([]byte, error)
+	// Get retrieves an item from the cache, decoding it into the provided target.
+	Get(ctx context.Context, key string, target any) error
 
 	// Delete removes an item from the cache.
 	// The item is identified by the given key and can be removed using the same key.

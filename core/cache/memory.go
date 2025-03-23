@@ -75,6 +75,7 @@ func (i *inMemoryCache) Close(ctx context.Context) error {
 	}
 
 	i.isClosed = true
+
 	return nil
 }
 

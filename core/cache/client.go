@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"fmt"
 	"sync"
 )
 
@@ -14,9 +15,9 @@ type cache struct {
 
 var _ Cache = (*cache)(nil)
 
-func (c *cache) Get(ctx context.Context, key string) (Item, error) {
+func (c *cache) GetRaw(ctx context.Context, key string) ([]byte, error) {
 	if c.isClosed {
-		return Item{}, ErrClosed
+		return nil, ErrClosed
 	}
 
 	if c.options.useMutex {
@@ -26,18 +27,36 @@ func (c *cache) Get(ctx context.Context, key string) (Item, error) {
 
 	value, err := c.provider.Get(ctx, key)
 	if err != nil {
-		return Item{}, err
+		return nil, fmt.Errorf("cache: failed to get key %q: %w", key, err)
 	}
 
-	item := Item{Key: key, Value: value}
+	return value, nil
+}
 
-	if c.options.decoder != nil {
-		if err = c.options.decoder(value, &item.Value); err != nil {
-			return item, err
-		}
+func (c *cache) Get(ctx context.Context, key string, target any) error {
+	if c.isClosed {
+		return ErrClosed
 	}
 
-	return item, nil
+	if c.options.decoder == nil {
+		return fmt.Errorf("cache: no decoder configured")
+	}
+
+	if c.options.useMutex {
+		c.mu.RLock()
+		defer c.mu.RUnlock()
+	}
+
+	value, err := c.provider.Get(ctx, key)
+	if err != nil {
+		return fmt.Errorf("cache: failed to get key %q: %w", key, err)
+	}
+
+	if err = c.options.decoder(value, target); err != nil {
+		return fmt.Errorf("cache: failed to decode key %q: %w", key, err)
+	}
+
+	return nil
 }
 
 func (c *cache) Set(ctx context.Context, item Item) error {
@@ -54,13 +73,22 @@ func (c *cache) Set(ctx context.Context, item Item) error {
 		item.ExpiresIn = DefaultExpiration
 	}
 
+	// If the value is already a byte slice, set it directly
+	// This is to avoid unnecessary encoding
+	if _, ok := item.Value.([]byte); ok {
+		return c.provider.Set(ctx, item)
+	}
+
+	if c.options.encoder == nil {
+		return fmt.Errorf("cache: no encoder configured")
+	}
+
 	val, err := c.options.encoder(item.Value)
 	if err != nil {
 		return err
 	}
 
 	item.Value = val
-
 	if err := c.provider.Set(ctx, item); err != nil {
 		return err
 	}
@@ -103,9 +131,9 @@ func (c *cache) Close(ctx context.Context) error {
 	return nil
 }
 
-// NewCache creates a new cache instance with the specified provider and options.
+// New creates a new cache instance with the specified provider and options.
 // If no options are provided, the cache instance is created with default options.
-func NewCache(provider Provider, opts ...Option) Cache {
+func New(provider Provider, opts ...Option) Cache {
 	options := newOption(opts...)
 
 	cache := &cache{

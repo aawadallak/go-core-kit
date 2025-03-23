@@ -35,11 +35,7 @@ func (c *cacheProvider) Set(ctx context.Context, item cache.Item) error {
 }
 
 func (c *cacheProvider) Delete(ctx context.Context, key string) error {
-	cmd := c.client.Del(ctx, key)
-	if cmd.Err() == redis.Nil {
-		return cache.ErrKeyNotFound
-	}
-	return cmd.Err()
+	return c.client.Del(ctx, key).Err()
 }
 
 // Close implements cache.Provider.

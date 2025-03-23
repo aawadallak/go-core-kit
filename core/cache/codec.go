@@ -68,6 +68,36 @@ func NewEncoderGzipJSON() Encoder {
 	}
 }
 
+// NewDecoderGzipJSON creates a new decoder that combines GZIP decompression with JSON unmarshaling.
+// This decoder is designed to work with data that was encoded using NewEncoderGzipJSON.
+// The process involves:
+// 1. Decompressing the GZIP data
+// 2. Unmarshaling the decompressed JSON into the target value
+func NewDecoderGzipJSON() Decoder {
+	return func(payload []byte, target any) error {
+		// Step 1: Decompress GZIP
+		reader := bytes.NewReader(payload)
+		gzReader, err := gzip.NewReader(reader)
+		if err != nil {
+			return err
+		}
+		defer gzReader.Close()
+
+		// Read decompressed data
+		decompressed, err := io.ReadAll(gzReader)
+		if err != nil {
+			return err
+		}
+
+		// Step 2: Unmarshal JSON into target
+		if err := json.Unmarshal(decompressed, target); err != nil {
+			return err
+		}
+
+		return nil
+	}
+}
+
 // NewDecoderGzip creates a new decoder that decompresses GZIP-compressed data.
 // This decoder is designed to work with raw byte slices and expects the target
 // to be a pointer to a byte slice (*[]byte).
@@ -118,41 +148,10 @@ func NewEncoderGzip() Encoder {
 	}
 }
 
-// NewDecoderGzipJSON creates a new decoder that combines GZIP decompression with JSON unmarshaling.
-// This decoder is designed to work with data that was encoded using NewEncoderGzipJSON.
-// The process involves:
-// 1. Decompressing the GZIP data
-// 2. Unmarshaling the decompressed JSON into the target value
-func NewDecoderGzipJSON() Decoder {
-	return func(payload []byte, target any) error {
-		// Step 1: Decompress GZIP
-		reader := bytes.NewReader(payload)
-		gzReader, err := gzip.NewReader(reader)
-		if err != nil {
-			return err
-		}
-		defer gzReader.Close()
-
-		// Read decompressed data
-		decompressed, err := io.ReadAll(gzReader)
-		if err != nil {
-			return err
-		}
-
-		// Step 2: Unmarshal JSON into target
-		if err := json.Unmarshal(decompressed, target); err != nil {
-			return err
-		}
-
-		return nil
-	}
-}
-
 // NewSmartEncoder creates an encoder that intelligently chooses between JSON and GZIP+JSON encoding
 // based on the size of the payload. This helps optimize storage and performance by:
 // - Using simple JSON encoding for small payloads (below threshold)
 // - Using GZIP+JSON encoding for large payloads (at or above threshold)
-// The encoder avoids double marshaling by reusing the JSON data for compression.
 func NewSmartEncoder(threshold int) Encoder {
 	return func(payload any) ([]byte, error) {
 		// Marshal to JSON once
@@ -178,5 +177,36 @@ func NewSmartEncoder(threshold int) Encoder {
 		}
 
 		return buf.Bytes(), nil
+	}
+}
+
+// NewSmartDecoder creates a decoder that intelligently handles both JSON and GZIP+JSON encoded data.
+// It detects the format based on GZIP magic bytes:
+// - If the data starts with 0x1f 0x8b, it decompresses with GZIP and then decodes the JSON.
+// - Otherwise, it assumes plain JSON and decodes directly.
+func NewSmartDecoder() Decoder {
+	return func(data []byte, target any) error {
+		// Check if the data is GZIP-compressed (magic bytes: 0x1f, 0x8b)
+		if len(data) >= 2 && data[0] == 0x1f && data[1] == 0x8b {
+			// GZIP-compressed data
+			buf := bytes.NewReader(data)
+			gzReader, err := gzip.NewReader(buf)
+			if err != nil {
+				return err
+			}
+			defer gzReader.Close()
+
+			// Read decompressed data
+			jsonData, err := io.ReadAll(gzReader)
+			if err != nil {
+				return err
+			}
+
+			// Decode JSON into target
+			return json.Unmarshal(jsonData, target)
+		}
+
+		// Plain JSON data
+		return json.Unmarshal(data, target)
 	}
 }
