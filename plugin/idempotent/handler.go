@@ -1,4 +1,4 @@
-package idempotent
+package idem
 
 import (
 	"context"
@@ -35,7 +35,6 @@ func (h *Handler[T]) Wrap(ctx context.Context, key string, fn idempotent.Hook[T]
 	// Attempt to retrieve the existing item from the repository
 	item, err := h.repository.Find(ctx, key)
 	if err == nil {
-		// If found, decode and return the cached payload
 		return h.decoder(item.Payload)
 	}
 

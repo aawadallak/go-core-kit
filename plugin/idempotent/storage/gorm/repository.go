@@ -1,4 +1,4 @@
-package idgorm
+package idemgorm
 
 import (
 	"context"
@@ -17,40 +17,60 @@ var (
 )
 
 const (
-	// TableName is the name of the table used for storing idempotent events
-	TableName = "tb_tx_outbox"
+	DefaultTableName = "idempotent_events"
 )
 
 // Entity represents the database model for idempotent events
 type Entity struct {
 	gorm.Model
-	Key     string `gorm:"uniqueIndex;not null;size:255"`
+	Key     string `gorm:"column:idem_key;uniqueIndex;not null;size:255"`
 	Payload []byte `gorm:"not null"`
-}
-
-// TableName returns the name of the table for the Entity
-func (e *Entity) TableName() string {
-	return TableName
 }
 
 // Repository implements the idempotent.Repository interface using GORM
 type Repository struct {
-	db *gorm.DB
+	db        *gorm.DB
+	tableName string
 }
 
-// NewRepository creates a new Repository instance with the given GORM DB connection
-func NewRepository(db *gorm.DB) (*Repository, error) {
+// Option defines the function signature for repository options
+type Option func(*Repository)
+
+// WithTableName sets a custom table name for the repository
+func WithTableName(name string) Option {
+	return func(r *Repository) {
+		r.tableName = name
+	}
+}
+
+// TableName returns the name of the table for the Entity
+func (e *Entity) TableName() string {
+	return "" // This will be overridden by GORM's tabler interface
+}
+
+// NewRepository creates a new Repository instance with the given GORM DB connection and options
+func NewRepository(db *gorm.DB, opts ...Option) (*Repository, error) {
 	if db == nil {
 		return nil, ErrDatabaseConnectionRequired
 	}
 
-	if err := db.AutoMigrate(&Entity{}); err != nil {
+	repo := &Repository{
+		db:        db,
+		tableName: DefaultTableName, // Set default table name
+	}
+
+	// Apply all provided options
+	for _, opt := range opts {
+		opt(repo)
+	}
+
+	if err := db.
+		Table(repo.tableName).
+		AutoMigrate(&Entity{}); err != nil {
 		return nil, err
 	}
 
-	return &Repository{
-		db: db,
-	}, nil
+	return repo, nil
 }
 
 // Save stores an idempotent event in the database
@@ -61,18 +81,16 @@ func (i *Repository) Save(ctx context.Context, item idempotent.EventItem) error 
 	if item.Payload == nil {
 		return ErrPayloadRequired
 	}
-
 	data := &Entity{
 		Key:     item.Key,
 		Payload: item.Payload,
 	}
-
 	if err := i.db.
+		Table(i.tableName).
 		WithContext(ctx).
 		Save(data).Error; err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -87,12 +105,16 @@ func (i *Repository) Find(ctx context.Context, key string) (*idempotent.EventIte
 		tx = i.db
 	}
 
-	out := &Entity{}
+	var out Entity
+
 	if err := tx.
+		Table(i.tableName).
 		WithContext(ctx).
+		Where("idem_key = ?", key). // GORM handles placeholder differences
+		// NOTE: Row-level locking (FOR UPDATE) only works when a transaction (`tx`) is provided.
+		// If `tx` is nil or not a real transaction, the row will not be locked.
 		Clauses(clause.Locking{Strength: "UPDATE"}).
-		Where("key = ?", key).
-		First(out).
+		First(&out).
 		Error; err != nil {
 		return nil, err
 	}

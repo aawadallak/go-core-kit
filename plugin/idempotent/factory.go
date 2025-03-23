@@ -1,13 +1,8 @@
-package idempotent
+package idem
 
 import (
-	"errors"
-
 	"github.com/aawadallak/go-core-kit/core/idempotent"
 )
-
-// ErrRepository is returned when a repository is not provided to the Handler.
-var ErrRepository = errors.New("repository is required")
 
 // Handler implements the idempotent.Handler interface for managing idempotent operations.
 // It uses an encoder to serialize results, a decoder to deserialize stored payloads,
@@ -51,44 +46,27 @@ func WithDecoder[T any](decoder idempotent.Decoder[T]) Option[T] {
 	}
 }
 
-// WithRepository returns an Option that sets the repository for the Handler.
-// This specifies the storage backend for persisting and retrieving idempotent events.
-//
-// Parameters:
-//   - repository: The Repository to use for event storage and retrieval.
-func WithRepository[T any](repository idempotent.Repository) Option[T] {
-	return func(h *Handler[T]) {
-		h.repository = repository
-	}
-}
-
 // NewHandler creates a new Handler instance with the specified options.
 // It initializes the Handler with default JSON codecs and requires a repository
 // to be set via options (or it fails). The functional options pattern allows
 // flexible configuration of the handler’s components.
 //
 // Parameters:
+//   - repository: The Repository to use for storing and retrieving idempotent events.
 //   - opts: Variadic list of Option functions to configure the Handler.
 //
 // Returns:
 //   - *Handler[T]: A configured Handler instance.
 //   - error: An error if the repository is not provided (ErrRepository).
-func NewHandler[T any](opts ...Option[T]) (*Handler[T], error) {
-	// Initialize with default JSON encoder and decoder
+func NewHandler[T any](repository idempotent.Repository, opts ...Option[T]) (*Handler[T], error) {
 	h := &Handler[T]{
-		encoder:    idempotent.NewJSONEncoder(),    // Default to JSON encoding
-		decoder:    idempotent.NewJSONDecoder[T](), // Default to JSON decoding
-		repository: nil,                            // Repository must be set via options
+		encoder:    idempotent.NewGzipJSONEncoder(),
+		decoder:    idempotent.NewGzipJSONDecoder[T](),
+		repository: repository,
 	}
 
-	// Apply each provided option to customize the Handler
 	for _, opt := range opts {
 		opt(h)
-	}
-
-	// Ensure a repository is provided, as it’s required for idempotency
-	if h.repository == nil {
-		return nil, ErrRepository // ErrRepository should be defined elsewhere
 	}
 
 	return h, nil
