@@ -3,6 +3,7 @@ package abstractrepo
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -31,12 +32,10 @@ func (r *AbstractRepository[T]) Update(ctx context.Context, target *T) (*T, erro
 	if !ok {
 		return nil, ErrInvalidType
 	}
-
 	tx, err := FromContext(ctx)
 	if err != nil {
 		tx = r.db
 	}
-
 	if err := tx.WithContext(ctx).
 		Where("id = ?", v.GetID()).
 		Updates(target).Error; err != nil {
@@ -51,18 +50,19 @@ func (r *AbstractRepository[T]) Delete(ctx context.Context, target *T) error {
 	if !ok {
 		return ErrInvalidType
 	}
-
 	tx, err := FromContext(ctx)
 	if err != nil {
 		tx = r.db
 	}
-
-	if err := tx.WithContext(ctx).
-		Where("id = ?", v.GetID()).
-		Delete(new(T)).Error; err != nil {
-		return fmt.Errorf("failed to delete entity with ID %d: %w", v.GetID(), err)
+	query := tx.WithContext(ctx).
+		Model(new(T)).
+		Where("id = ?", v.GetID())
+	if r.opts.SoftDelete {
+		err = query.Update("deleted_at", time.Now()).Error
+	} else {
+		err = query.Delete(new(T)).Error
 	}
-	return nil
+	return err
 }
 
 // FindOne retrieves a single entity matching the provided filter.
@@ -72,11 +72,14 @@ func (r *AbstractRepository[T]) FindOne(ctx context.Context, filter any) (*T, er
 	if err != nil {
 		tx = r.db
 	}
+	if r.opts.SoftDelete {
+		tx = tx.Scopes(notDeletedScope)
+	}
 	if err := tx.
 		WithContext(ctx).
 		Where(filter).
 		Take(&out).Error; err != nil {
-		return nil, fmt.Errorf("failed to find entity: %w", err)
+		return nil, err
 	}
 	return &out, nil
 }
@@ -88,8 +91,11 @@ func (r *AbstractRepository[T]) Find(ctx context.Context, filter any) ([]*T, err
 	if err != nil {
 		tx = r.db
 	}
+	if r.opts.SoftDelete {
+		tx = tx.Scopes(notDeletedScope)
+	}
 	if err := tx.WithContext(ctx).Where(filter).Find(&out).Error; err != nil {
-		return nil, fmt.Errorf("failed to find entities: %w", err)
+		return nil, err
 	}
 	return out, nil
 }

@@ -19,18 +19,6 @@ type AbstractPaginatedRepository[T, E any] struct {
 
 var _ repository.AbstractPaginatedRepository[any, any] = (*AbstractPaginatedRepository[any, any])(nil)
 
-// Save creates a new entity in the database.
-func (r *AbstractPaginatedRepository[T, E]) Save(ctx context.Context, target *T) (*T, error) {
-	tx, err := FromContext(ctx)
-	if err != nil {
-		tx = r.db
-	}
-	if err := tx.WithContext(ctx).Create(target).Error; err != nil {
-		return nil, fmt.Errorf("failed to create entity: %w", err)
-	}
-	return target, nil
-}
-
 // FindAll retrieves a paginated list of entities based on the provided query.
 // It supports sorting, pagination, and returns a Pagination struct with results.
 func (r *AbstractPaginatedRepository[T, E]) FindAll(
@@ -41,6 +29,10 @@ func (r *AbstractPaginatedRepository[T, E]) FindAll(
 	}
 
 	instance := tx.WithContext(ctx).Model(new(T))
+
+	if r.opts.SoftDelete {
+		instance = instance.Scopes(notDeletedScope)
+	}
 
 	// Get total count
 	var count int64

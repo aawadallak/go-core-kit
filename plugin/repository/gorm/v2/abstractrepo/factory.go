@@ -1,20 +1,24 @@
 package abstractrepo
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-// DefaultEntityIndexes returns the default indexes for the core Entity fields
-func DefaultEntityIndexes() []IndexConfig {
-	return []IndexConfig{
+// defaultEntityIndexes returns the default indexes for the core Entity fields
+func defaultEntityIndexes() []indexConfig {
+	return []indexConfig{
 		{
 			Name:   "idx_entity_external_id",
 			Fields: []string{"external_id"},
-			Type:   "index",
+			Type:   "unique",
 		},
 		{
 			Name:   "idx_entity_created_at",
@@ -34,8 +38,8 @@ func DefaultEntityIndexes() []IndexConfig {
 	}
 }
 
-// IndexConfig represents the configuration for a single index
-type IndexConfig struct {
+// indexConfig represents the configuration for a single index
+type indexConfig struct {
 	// Name is the name of the index
 	Name string
 	// Fields are the fields that make up the index
@@ -49,40 +53,63 @@ type Option func(*options)
 
 // options defines configuration options for repository creation
 type options struct {
-	// UseUUID indicates whether to use UUID for external IDs
-	UseUUID bool
+	// Migrate indicates whether to migrate the database
+	Migrate bool
 	// ApplyDefaultEntityIndexes indicates whether to apply default indexes for core Entity fields
 	ApplyDefaultEntityIndexes bool
+	// SoftDelete indicates whether to use soft delete
+	SoftDelete bool
 }
 
-// WithDefaultEntityIndexes returns an Option that will apply default indexes for core Entity fields
-func WithDefaultEntityIndexes() Option {
+func WithMigrate() Option {
 	return func(o *options) {
-		o.ApplyDefaultEntityIndexes = true
+		o.Migrate = true
 	}
 }
 
-// WithUUID returns an Option that enables UUID
-func WithUUID() Option {
+// WithDefaultEntityIndexesOmitted configures the repository to skip applying default indexes for core Entity fields.
+func WithDefaultEntityIndexesOmitted() Option {
 	return func(o *options) {
-		o.UseUUID = true
+		o.ApplyDefaultEntityIndexes = false
 	}
 }
 
-// applyIndexes applies the specified indexes to the database
-func applyIndexes[T any](db *gorm.DB, opts options) error {
-	// Initialize indexes as an empty slice to avoid nil panic when appending
-	indexes := make([]IndexConfig, 0)
-
-	// Add default entity indexes if requested
-	if opts.ApplyDefaultEntityIndexes {
-		indexes = append(indexes, DefaultEntityIndexes()...)
+// WithHardDelete configures the repository to use hard delete instead of soft delete.
+func WithHardDelete() Option {
+	return func(o *options) {
+		o.SoftDelete = false
 	}
+}
 
-	// Create the indexes
+// applyIndexes applies the specified indexes to the database if they don't already exist
+func applyIndexes[T any](db *gorm.DB) error {
+	indexes := defaultEntityIndexes()
+
+	// Get the table name for type T
+	var model T
+	tableName := db.NamingStrategy.TableName(reflect.TypeOf(model).Name())
+
 	for _, idx := range indexes {
-		// Create the index using GORM's migrator
-		if err := db.Migrator().CreateIndex(new(T), idx.Name); err != nil {
+		fields := strings.Join(idx.Fields, ", ")
+		indexType := "INDEX"
+		if idx.Type == "unique" {
+			indexType = "UNIQUE INDEX"
+		}
+
+		// Construct the raw SQL query for index creation
+		query := fmt.Sprintf("CREATE %s %s ON %s (%s)",
+			indexType,
+			idx.Name,
+			tableName,
+			fields,
+		)
+
+		// Attempt to create the index
+		if err := db.Exec(query).Error; err != nil {
+			// Check if the error is because the index already exists
+			if isIndexExistsError(err) {
+				continue
+			}
 			return fmt.Errorf("failed to create index %s: %w", idx.Name, err)
 		}
 	}
@@ -90,8 +117,22 @@ func applyIndexes[T any](db *gorm.DB, opts options) error {
 	return nil
 }
 
-// setupUUIDHooks sets up GORM hooks to automatically set UUID for external IDs
-func setupUUIDHooks[T any](db *gorm.DB) {
+// isIndexExistsError checks if the error indicates the index already exists
+func isIndexExistsError(err error) bool {
+	if err == nil {
+		return false
+	}
+	errStr := strings.ToLower(err.Error())
+	// Common error messages for "index already exists" across databases
+	return strings.Contains(errStr, "already exists") ||
+		strings.Contains(errStr, "duplicate key") ||
+		strings.Contains(errStr, "duplicate index") ||
+		strings.Contains(errStr, "exists") ||
+		errors.Is(err, gorm.ErrDuplicatedKey)
+}
+
+// setupUUIDCallback sets up GORM hooks to automatically set UUID for external IDs
+func setupUUIDCallback[T any](db *gorm.DB) {
 	db.Callback().Create().Before("gorm:create").Register("set_uuid", func(db *gorm.DB) {
 		dest := db.Statement.Dest
 		if dest == nil {
@@ -124,23 +165,23 @@ func NewAbstractPaginatedRepository[T, E any](
 		opts: *options,
 	}
 
-	if err := applyIndexes[T](db, *options); err != nil {
-		return nil, fmt.Errorf("failed to apply indexes: %w", err)
-	}
-
-	if options.UseUUID {
-		setupUUIDHooks[T](db)
-	}
-
 	return instance, nil
 }
 
 func NewAbstractRepository[T any](
 	db *gorm.DB, opts ...Option) (*AbstractRepository[T], error) {
-	options := &options{}
+	options := &options{
+		Migrate:                   false,
+		SoftDelete:                true,
+		ApplyDefaultEntityIndexes: true,
+	}
 
 	for _, opt := range opts {
 		opt(options)
+	}
+
+	if val, err := strconv.ParseBool(os.Getenv("DB_MIGRATE")); err == nil {
+		options.Migrate = val
 	}
 
 	instance := &AbstractRepository[T]{
@@ -148,13 +189,23 @@ func NewAbstractRepository[T any](
 		opts: *options,
 	}
 
-	if err := applyIndexes[T](db, *options); err != nil {
-		return nil, fmt.Errorf("failed to apply indexes: %w", err)
+	if options.Migrate {
+		if err := db.AutoMigrate(new(T)); err != nil {
+			return nil, fmt.Errorf("failed to migrate: %w", err)
+		}
 	}
 
-	if options.UseUUID {
-		setupUUIDHooks[T](db)
+	if options.ApplyDefaultEntityIndexes {
+		if err := applyIndexes[T](db); err != nil {
+			return nil, fmt.Errorf("failed to apply indexes: %w", err)
+		}
 	}
+
+	setupUUIDCallback[T](db)
 
 	return instance, nil
+}
+
+func notDeletedScope(db *gorm.DB) *gorm.DB {
+	return db.Where("deleted_at IS NULL")
 }
