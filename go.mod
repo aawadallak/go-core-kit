@@ -9,6 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.1
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.49.2
 	github.com/go-chi/chi/v5 v5.2.1
+	go.uber.org/zap v1.27.0
 )
 
 require (
@@ -98,6 +99,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.34.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.34.0 // indirect
 	go.opentelemetry.io/otel/trace v1.34.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
