@@ -12,7 +12,7 @@ type valueMap struct {
 
 var _ ValueMap = (*valueMap)(nil)
 
-// GetInteger retrieves an integer value for the given key.
+// GetInt retrieves an integer value for the given key.
 // Returns 0 if the key is not found or the value cannot be converted to an integer.
 func (v *valueMap) GetInt(key string) int {
 	value, ok := v.get(key)
@@ -32,7 +32,7 @@ func (v *valueMap) GetBool(key string) bool {
 	return convertToBool(value)
 }
 
-// String retrieves a string value for the given key.
+// GetString retrieves a string value for the given key.
 // Returns an empty string if the key is not found.
 func (v *valueMap) GetString(key string) string {
 	value, ok := v.get(key)
@@ -52,7 +52,7 @@ func (v *valueMap) GetBytes(key string) []byte {
 	return []byte(value)
 }
 
-// MustGetInteger retrieves an integer value for the given key.
+// MustGetInt retrieves an integer value for the given key.
 // Panics if the key is not found or the value cannot be converted to an integer.
 func (v *valueMap) MustGetInt(key string) int {
 	value, ok := v.get(key)
