@@ -31,7 +31,7 @@ func findSSMParameterReferences(providers []conf.Provider) []ssmParameter {
 
 			parameters = append(parameters, ssmParameter{
 				key:   key,
-				value: strings.TrimPrefix(value, prefixPattern),
+				value: strings.Split(value, prefixPattern)[1],
 			})
 		})
 	}

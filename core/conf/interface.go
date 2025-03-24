@@ -2,59 +2,59 @@ package conf
 
 import "context"
 
-// ScanFunc is a function type used for scanning key-value pairs.
-// It takes a key and value string as parameters.
+// ScanFunc defines a function type for scanning configuration key-value pairs.
+// It accepts key and value as string parameters.
 type ScanFunc func(key string, value string)
 
-// ValueMap defines the interface for retrieving configuration values.
-// It provides methods to get configuration values of different types.
+// ValueMap specifies an interface for accessing configuration values.
+// It offers methods to retrieve values in various data types.
 type ValueMap interface {
-	// GetInteger retrieves an integer value for the given key.
-	// Returns 0 if the key is not found or the value cannot be converted to an integer.
-	GetInteger(key string) int
+	// GetInt returns the integer value associated with the specified key.
+	// Returns 0 if the key doesn't exist or if conversion to integer fails.
+	GetInt(key string) int
 
-	// GetBoolean retrieves a boolean value for the given key.
-	// Returns false if the key is not found or the value cannot be converted to a boolean.
-	GetBoolean(key string) bool
+	// GetBool returns the boolean value associated with the specified key.
+	// Returns false if the key doesn't exist or if conversion to boolean fails.
+	GetBool(key string) bool
 
-	// GetText retrieves a string value for the given key.
-	// Returns an empty string if the key is not found.
-	GetText(key string) string
+	// GetString returns the string value associated with the specified key.
+	// Returns an empty string if the key doesn't exist.
+	GetString(key string) string
 
-	// GetBytes retrieves a byte slice value for the given key.
-	// Returns nil if the key is not found.
+	// GetBytes returns the byte slice value associated with the specified key.
+	// Returns nil if the key doesn't exist.
 	GetBytes(key string) []byte
 
-	// MustGetInteger retrieves an integer value for the given key.
-	// Panics if the key is not found or the value cannot be converted to an integer.
-	MustGetInteger(key string) int
+	// MustGetInt returns the integer value for the specified key.
+	// Panics if the key doesn't exist or if conversion to integer fails.
+	MustGetInt(key string) int
 
-	// MustGetBoolean retrieves a boolean value for the given key.
-	// Panics if the key is not found or the value cannot be converted to a boolean.
-	MustGetBoolean(key string) bool
+	// MustGetBool returns the boolean value for the specified key.
+	// Panics if the key doesn't exist or if conversion to boolean fails.
+	MustGetBool(key string) bool
 
-	// MustGetText retrieves a string value for the given key.
-	// Panics if the key is not found.
-	MustGetText(key string) string
+	// MustGetString returns the string value for the specified key.
+	// Panics if the key doesn't exist.
+	MustGetString(key string) string
 
-	// MustGetBytes retrieves a byte slice value for the given key.
-	// Panics if the key is not found.
+	// MustGetBytes returns the byte slice value for the specified key.
+	// Panics if the key doesn't exist.
 	MustGetBytes(key string) []byte
 }
 
-// Provider defines the interface for configuration providers.
-// A provider is responsible for pulling and looking up configuration values.
+// Provider defines an interface for configuration providers.
+// It handles the retrieval and lookup of configuration values.
 type Provider interface {
-	// Load retrieves configuration values from the provider.
-	// The others parameter contains other providers that may be used for dependency resolution.
-	// Returns an error if the load operation fails.
+	// Load fetches configuration values from the provider.
+	// Uses context for cancellation/timeout and other providers for dependency resolution.
+	// Returns an error if the loading process fails.
 	Load(ctx context.Context, others []Provider) error
 
-	// Lookup retrieves a configuration value for the given key.
-	// Returns the value and a boolean indicating if the key was found.
+	// Lookup retrieves the value for a given key.
+	// Returns the value as a string and a boolean indicating if the key was found.
 	Lookup(key string) (string, bool)
 
-	// Scan iterates over all key-value pairs in the provider.
-	// The provided function is called for each key-value pair.
+	// Scan iterates through all key-value pairs in the provider.
+	// Executes the provided function for each pair encountered.
 	Scan(fn ScanFunc)
 }
