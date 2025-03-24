@@ -6,6 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.25.3
 	github.com/aws/aws-sdk-go-v2/config v1.27.7
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.49.2
+	github.com/go-chi/chi/v5 v5.2.1
 )
 
 require (
