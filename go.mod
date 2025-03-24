@@ -20,8 +20,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.23.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.4 // indirect
 	github.com/aws/smithy-go v1.20.1 // indirect
-	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/google/uuid v1.6.0
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.12
 	github.com/testcontainers/testcontainers-go v0.35.0
 	google.golang.org/protobuf v1.36.5
