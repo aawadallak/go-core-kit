@@ -14,7 +14,7 @@ import (
 func TestRedisProvider(t *testing.T) {
 	ctx := context.Background()
 
-	provider, err := redis.NewRedisProvider(ctx,
+	provider, err := redis.NewProvider(ctx,
 		redis.WithAddress("localhost:6379"),
 	)
 	assert.NoError(t, err)
@@ -96,7 +96,7 @@ func TestRedisProvider(t *testing.T) {
 func TestRedisProviderWithCache(t *testing.T) {
 	ctx := context.Background()
 
-	provider, err := redis.NewRedisProvider(ctx,
+	provider, err := redis.NewProvider(ctx,
 		redis.WithAddress("localhost:6379"),
 	)
 	assert.NoError(t, err)
@@ -144,7 +144,7 @@ func TestRedisProviderWithCache(t *testing.T) {
 func TestRedisProviderWithCacheResolver_Get(t *testing.T) {
 	ctx := context.Background()
 
-	provider, err := redis.NewRedisProvider(ctx,
+	provider, err := redis.NewProvider(ctx,
 		redis.WithAddress("localhost:6379"),
 	)
 	assert.NoError(t, err)
@@ -214,7 +214,7 @@ func TestRedisProviderWithCacheResolver_Get(t *testing.T) {
 func TestRedisProviderWithCacheResolver(t *testing.T) {
 	ctx := context.Background()
 
-	provider, err := redis.NewRedisProvider(ctx,
+	provider, err := redis.NewProvider(ctx,
 		redis.WithAddress("localhost:6379"),
 	)
 	assert.NoError(t, err)

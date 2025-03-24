@@ -47,7 +47,7 @@ func (c *cacheProvider) Close(_ context.Context) error {
 	return c.client.Close()
 }
 
-// NewRedisProvider returns a new Redis cache provider with the specified options.
+// NewProvider returns a new Redis cache provider with the specified options.
 //
 // This function creates a new cache provider that uses Redis as the backend store.
 // The options parameter can be used to configure various aspects of the Redis client,
@@ -55,7 +55,7 @@ func (c *cacheProvider) Close(_ context.Context) error {
 //
 // Example usage:
 //
-//	redisProvider, err := NewRedisProvider(
+//	redisProvider, err := NewProvider(
 //	    WithAddress("localhost:6379"),
 //	    WithPassword("mypassword"),
 //	    WithPoolSize(10),
@@ -64,7 +64,7 @@ func (c *cacheProvider) Close(_ context.Context) error {
 //
 // The returned provider object implements the cache.Provider interface and can be used
 // to perform cache operations such as Set, Get, and Delete.
-func NewRedisProvider(ctx context.Context, opts ...Option) (cache.Provider, error) {
+func NewProvider(ctx context.Context, opts ...Option) (cache.Provider, error) {
 	provider := &cacheProvider{
 		options: newOptions(opts...),
 	}
