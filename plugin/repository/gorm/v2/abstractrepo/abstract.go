@@ -66,7 +66,7 @@ func (r *AbstractRepository[T]) Delete(ctx context.Context, target *T) error {
 }
 
 // FindOne retrieves a single entity matching the provided filter.
-func (r *AbstractRepository[T]) FindOne(ctx context.Context, filter any) (*T, error) {
+func (r *AbstractRepository[T]) FindOne(ctx context.Context, filter *T) (*T, error) {
 	var out T
 	tx, err := FromContext(ctx)
 	if err != nil {
@@ -85,7 +85,7 @@ func (r *AbstractRepository[T]) FindOne(ctx context.Context, filter any) (*T, er
 }
 
 // Find retrieves all entities matching the provided filter.
-func (r *AbstractRepository[T]) Find(ctx context.Context, filter any) ([]*T, error) {
+func (r *AbstractRepository[T]) Find(ctx context.Context, filter *T) ([]*T, error) {
 	var out []*T
 	tx, err := FromContext(ctx)
 	if err != nil {
