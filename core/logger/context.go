@@ -26,12 +26,12 @@ func fromContext(ctx context.Context) Logger {
 
 // WithContext appends a single option to the existing logger in the context
 // If no logger exists, creates a new one with the provided option
-func WithContext(ctx context.Context, opt Option) context.Context {
+func WithContext(ctx context.Context, opt ...Option) context.Context {
 	current := fromContext(ctx)
 	if current == nil {
-		return context.WithValue(ctx, loggerContext, New(opt))
+		return context.WithValue(ctx, loggerContext, New(opt...))
 	}
-	newLogger := current.With(opt)
+	newLogger := current.With(opt...)
 	return context.WithValue(ctx, loggerContext, newLogger)
 }
 
