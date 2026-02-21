@@ -8,7 +8,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sns v1.34.2
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.1
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.49.2
-	github.com/go-chi/chi/v5 v5.2.1
 	go.uber.org/zap v1.27.0
 )
 
