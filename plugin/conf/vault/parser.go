@@ -33,10 +33,10 @@ func extractMountPath(path, defaultMount string) (mount, secretPath string) {
 func extractVaultReferences(pairs []kv) []vaultRef {
 	var refs []vaultRef
 	for _, p := range pairs {
-		if strings.HasPrefix(p.value, vaultPrefix) {
+		if vaultPath, ok := strings.CutPrefix(p.value, vaultPrefix); ok {
 			refs = append(refs, vaultRef{
 				key:       p.key,
-				vaultPath: strings.TrimPrefix(p.value, vaultPrefix),
+				vaultPath: vaultPath,
 			})
 		}
 	}

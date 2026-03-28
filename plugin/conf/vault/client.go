@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -18,7 +19,7 @@ func newVaultClient() (*vaultapi.Client, string, error) {
 	}
 	token := os.Getenv("VAULT_TOKEN")
 	if token == "" {
-		return nil, "", fmt.Errorf("VAULT_TOKEN environment variable is not set")
+		return nil, "", errors.New("VAULT_TOKEN environment variable is not set")
 	}
 	client, err := vaultapi.NewClient(&vaultapi.Config{Address: addr})
 	if err != nil {

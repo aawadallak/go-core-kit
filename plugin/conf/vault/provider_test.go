@@ -2,7 +2,6 @@ package vault
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/aawadallak/go-core-kit/core/conf"
@@ -40,7 +39,7 @@ func setupVault(t *testing.T) *vaultapi.Client {
 func seedSecret(t *testing.T, client *vaultapi.Client, path string, data map[string]any) {
 	t.Helper()
 	_, err := client.Logical().WriteWithContext(t.Context(),
-		fmt.Sprintf("secret/data/%s", path),
+		"secret/data/"+path,
 		map[string]any{"data": data},
 	)
 	require.NoError(t, err)
@@ -118,7 +117,7 @@ func TestVaultProvider_SecretNotFound(t *testing.T) {
 
 	p := NewProvider()
 	err := p.Load(t.Context(), []conf.Provider{env})
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.ErrorContains(t, err, "nonexistent/secret")
 }
 
@@ -127,7 +126,7 @@ func TestVaultProvider_NoopWhenNoToken(t *testing.T) {
 
 	p := NewProvider()
 	err := p.Load(t.Context(), nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, ok := p.Lookup("anything")
 	assert.False(t, ok)
