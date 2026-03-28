@@ -7,7 +7,7 @@ type options struct {
 
 type Option func(*options)
 
-// WithAddCaller enables caller information in the log output
+// WithEnableCaller enables caller information in the log output.
 func WithEnableCaller() Option {
 	return func(o *options) {
 		o.enableCaller = true

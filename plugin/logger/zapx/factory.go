@@ -18,7 +18,7 @@ type ZapProvider struct {
 // Ensure ZapProvider implements the Provider interface.
 var _ logger.Provider = (*ZapProvider)(nil)
 
-// defaultZapProvider creates a new ZapProvider with the default configuration.
+// NewProvider creates a new ZapProvider with the default configuration.
 func NewProvider(opts ...Option) (logger.Provider, error) {
 	options := newOptions(opts...)
 
@@ -54,14 +54,14 @@ func NewProvider(opts ...Option) (logger.Provider, error) {
 
 	lOptions := []zap.Option{}
 
-	logger, err := cfg.Build(lOptions...)
+	zapLogger, err := cfg.Build(lOptions...)
 	if err != nil {
 		return nil, err
 	}
 
-	zap.ReplaceGlobals(logger)
+	zap.ReplaceGlobals(zapLogger)
 
-	return &ZapProvider{logger: logger, level: logLevel, options: options}, nil
+	return &ZapProvider{logger: zapLogger, level: logLevel, options: options}, nil
 }
 
 // Write logs a message with the specified level and attributes.

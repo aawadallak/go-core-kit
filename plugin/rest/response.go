@@ -85,7 +85,7 @@ func New(w http.ResponseWriter, status int, opts ...ResponseOption) error {
 	return err
 }
 
-// Success response helpers
+// NewStatusOK creates a response with HTTP 200 status.
 func NewStatusOK(w http.ResponseWriter, opts ...ResponseOption) error {
 	return New(w, http.StatusOK, opts...)
 }
@@ -140,7 +140,7 @@ func newErrorResponse(w http.ResponseWriter, status int, cause error, opts ...Er
 	return New(w, status, rOpt...)
 }
 
-// Error response helpers
+// NewStatusBadRequest creates a response with HTTP 400 status.
 func NewStatusBadRequest(w http.ResponseWriter, cause error, opts ...ErrorResponseOption) error {
 	return newErrorResponse(w, http.StatusBadRequest, cause, opts...)
 }

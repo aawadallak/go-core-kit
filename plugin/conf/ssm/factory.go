@@ -48,7 +48,7 @@ func (p *provider) Scan(fn conf.ScanFunc) {
 	}
 }
 
-// Load fetches parameters from SSM and updates the local data store
+// Load fetches parameters from SSM and updates the local data store.
 func (p *provider) Load(ctx context.Context, others []conf.Provider) error {
 	parameters := findSSMParameterReferences(others)
 	if len(parameters) == 0 {
@@ -57,10 +57,7 @@ func (p *provider) Load(ctx context.Context, others []conf.Provider) error {
 
 	// Process secrets in batches
 	for i := 0; i < len(parameters); i += maxParamsPerRequest {
-		end := i + maxParamsPerRequest
-		if end > len(parameters) {
-			end = len(parameters)
-		}
+		end := min(i+maxParamsPerRequest, len(parameters))
 
 		batch := parameters[i:end]
 		params := make([]string, len(batch))

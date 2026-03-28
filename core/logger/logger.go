@@ -23,7 +23,10 @@ func New(opts ...Option) *logger {
 	// If global logger exists, inherit its configuration
 	if global != nil {
 		if globalLogger, ok := global.logger.(*logger); ok {
-			l.cfg = append(globalLogger.cfg, opts...)
+			merged := make([]Option, 0, len(globalLogger.cfg)+len(opts))
+			merged = append(merged, globalLogger.cfg...)
+			merged = append(merged, opts...)
+			l.cfg = merged
 		}
 	}
 
@@ -38,7 +41,7 @@ func New(opts ...Option) *logger {
 // With creates a new logger instance with additional options appended to existing ones
 func (l *logger) With(opts ...Option) Logger {
 	// Create a new slice to avoid modifying the original
-	newCfg := make([]Option, len(l.cfg))
+	newCfg := make([]Option, len(l.cfg), len(l.cfg)+len(opts))
 	copy(newCfg, l.cfg)
 	newCfg = append(newCfg, opts...)
 

@@ -41,7 +41,7 @@ func (h *Handler[T]) Start(ctx context.Context, workerCount int) error {
 	}
 
 	h.wg.Add(workerCount)
-	for i := 0; i < workerCount; i++ {
+	for range workerCount {
 		go h.worker(ctx)
 	}
 

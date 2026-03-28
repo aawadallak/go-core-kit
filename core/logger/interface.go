@@ -1,3 +1,4 @@
+// Package logger provides a structured logging abstraction with multiple severity levels and pluggable providers.
 package logger
 
 // Logger defines the interface for logging operations at different severity levels.
