@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`plugin/conf/onepassword`** — 1Password configuration provider using the official SDK, `op://` prefix resolution, and graceful noop fallback.
 - **`plugin/conf/vault`** — HashiCorp Vault configuration provider with KV v1/v2 support, `vault://` prefix resolution, inline mount path override, and graceful noop fallback.
 - **`pkg/common/request_context.go`** — Transport-agnostic `RequestContext` (RequestID, TraceID, SpanID) with context helpers.
 - **`plugin/cache/msgpack`** — MsgPack encoder/decoder codec for `core/cache` (moved from core to plugin).
