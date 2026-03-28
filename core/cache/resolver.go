@@ -2,7 +2,7 @@ package cache
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 )
 
@@ -129,7 +129,7 @@ func (r *Resolver[T]) GetOrFetch(ctx context.Context, fallback Handler[T]) (T, e
 	}
 
 	if fallback == nil {
-		return target, fmt.Errorf("cache: no fallback provided")
+		return target, errors.New("cache: no fallback provided")
 	}
 
 	// Resolve using fallback if cache miss or error

@@ -49,12 +49,12 @@ func NewProvider(opts ...Option) (logger.Provider, error) {
 
 	// Configure slog handler with JSON output and level
 	handler := slog.NewJSONHandler(os.Stdout, lOptions)
-	logger := slog.New(handler)
+	slogLogger := slog.New(handler)
 
-	slog.SetDefault(logger)
+	slog.SetDefault(slogLogger)
 
 	return &SlogProvider{
-		logger: logger,
+		logger: slogLogger,
 		level:  logLevel,
 	}, nil
 }

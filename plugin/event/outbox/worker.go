@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/aawadallak/go-core-kit/core/logger"
 	cevent "github.com/aawadallak/go-core-kit/core/event"
+	"github.com/aawadallak/go-core-kit/core/logger"
 )
 
 const (

@@ -57,7 +57,7 @@ func (v *valueMap) GetBytes(key string) []byte {
 func (v *valueMap) MustGetInt(key string) int {
 	value, ok := v.get(key)
 	if !ok {
-		panic(fmt.Sprintf("key not found: %s", key))
+		panic("key not found: " + key)
 	}
 	return convertToInt(value)
 }
@@ -67,7 +67,7 @@ func (v *valueMap) MustGetInt(key string) int {
 func (v *valueMap) MustGetBool(key string) bool {
 	value, ok := v.get(key)
 	if !ok {
-		panic(fmt.Sprintf("key not found: %s", key))
+		panic("key not found: " + key)
 	}
 	return convertToBool(value)
 }
@@ -77,7 +77,7 @@ func (v *valueMap) MustGetBool(key string) bool {
 func (v *valueMap) MustGetString(key string) string {
 	value, ok := v.get(key)
 	if !ok {
-		panic(fmt.Sprintf("key not found: %s", key))
+		panic("key not found: " + key)
 	}
 	return value
 }
@@ -87,7 +87,7 @@ func (v *valueMap) MustGetString(key string) string {
 func (v *valueMap) MustGetBytes(key string) []byte {
 	value, ok := v.get(key)
 	if !ok {
-		panic(fmt.Sprintf("key not found: %s", key))
+		panic("key not found: " + key)
 	}
 	return []byte(value)
 }

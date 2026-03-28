@@ -30,10 +30,7 @@ func mapToPublishEntries(encoder broker.Encoder, messages ...broker.Message) ([]
 			return nil, err
 		}
 
-		entry, err := mapToPublishEntry(string(payload), message.Attributes())
-		if err != nil {
-			return nil, err
-		}
+		entry := mapToPublishEntry(string(payload), message.Attributes())
 
 		entries = append(entries, entry)
 	}
@@ -41,7 +38,7 @@ func mapToPublishEntries(encoder broker.Encoder, messages ...broker.Message) ([]
 	return entries, nil
 }
 
-func mapToPublishEntry(body string, attributes broker.Attributes) (types.PublishBatchRequestEntry, error) {
+func mapToPublishEntry(body string, attributes broker.Attributes) types.PublishBatchRequestEntry {
 	res := types.PublishBatchRequestEntry{
 		Id:                aws.String(uuid.NewString()),
 		Message:           aws.String(body),
@@ -57,5 +54,5 @@ func mapToPublishEntry(body string, attributes broker.Attributes) (types.Publish
 		}
 	}
 
-	return res, nil
+	return res
 }

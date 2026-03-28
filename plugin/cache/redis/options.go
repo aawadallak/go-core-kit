@@ -48,29 +48,29 @@ func WithDB(db int) Option {
 // WithMaxRetry sets the maximum number of retry attempts option.
 func WithMaxRetry(attempts uint) Option {
 	return func(o *options) {
-		o.redisOptions.MaxRetries = int(attempts)
+		o.redisOptions.MaxRetries = int(attempts) //nolint:gosec // retry attempts are inherently small values
 	}
 }
 
 // WithRetryBackoff sets the retry backoff time range options.
-func WithRetryBackoff(min, max time.Duration) Option {
+func WithRetryBackoff(minBackoff, maxBackoff time.Duration) Option {
 	return func(o *options) {
-		o.redisOptions.MinRetryBackoff = min
-		o.redisOptions.MaxRetryBackoff = max
+		o.redisOptions.MinRetryBackoff = minBackoff
+		o.redisOptions.MaxRetryBackoff = maxBackoff
 	}
 }
 
 // WithPoolSize sets the connection pool size option.
 func WithPoolSize(size uint) Option {
 	return func(o *options) {
-		o.redisOptions.PoolSize = int(size)
+		o.redisOptions.PoolSize = int(size) //nolint:gosec // pool size is inherently a small value
 	}
 }
 
 // WithMinIdleConns sets the minimum number of idle connections option.
 func WithMinIdleConns(size uint) Option {
 	return func(o *options) {
-		o.redisOptions.MinIdleConns = int(size)
+		o.redisOptions.MinIdleConns = int(size) //nolint:gosec // idle conns is inherently a small value
 	}
 }
 

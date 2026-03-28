@@ -17,7 +17,7 @@ type TaskProvider interface {
 	Execute(context.Context) error
 }
 
-// Optional lifecycle hooks
+// OnStarter is an optional lifecycle hook for workers that need initialization on start.
 type OnStarter interface {
 	OnStart(context.Context) error
 }

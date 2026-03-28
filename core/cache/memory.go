@@ -25,8 +25,7 @@ func (i *inMemoryCache) Set(ctx context.Context, item Item) error {
 
 	if item.ExpiresIn > 0 {
 		time.AfterFunc(item.ExpiresIn, func() {
-			//nolint:errcheck
-			i.Delete(context.TODO(), item.Key)
+			_ = i.Delete(context.TODO(), item.Key)
 		})
 	}
 

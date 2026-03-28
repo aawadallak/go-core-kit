@@ -42,8 +42,8 @@ func findSSMParameterReferences(providers []conf.Provider) []ssmParameter {
 // fetchSSMParameters retrieves parameter values from AWS SSM using the provided parameter names.
 // It fetches the parameters with decryption enabled and stores them in the provider's data map.
 // Returns an error if the parameters cannot be retrieved or if any parameters are invalid.
-func (s *provider) fetchSSMParameters(ctx context.Context, parameterNames []string) error {
-	res, err := s.client.GetParameters(ctx, &ssm.GetParametersInput{
+func (p *provider) fetchSSMParameters(ctx context.Context, parameterNames []string) error {
+	res, err := p.client.GetParameters(ctx, &ssm.GetParametersInput{
 		Names:          parameterNames,
 		WithDecryption: aws.Bool(true),
 	})
@@ -56,7 +56,7 @@ func (s *provider) fetchSSMParameters(ctx context.Context, parameterNames []stri
 	}
 
 	for _, param := range res.Parameters {
-		s.data[*param.Name] = *param.Value
+		p.data[*param.Name] = *param.Value
 	}
 
 	return nil

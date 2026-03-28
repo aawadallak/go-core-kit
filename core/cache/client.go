@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 )
@@ -39,7 +40,7 @@ func (c *cache) Get(ctx context.Context, key string, target any) error {
 	}
 
 	if c.options.decoder == nil {
-		return fmt.Errorf("cache: no decoder configured")
+		return errors.New("cache: no decoder configured")
 	}
 
 	if c.options.useMutex {
@@ -80,7 +81,7 @@ func (c *cache) Set(ctx context.Context, item Item) error {
 	}
 
 	if c.options.encoder == nil {
-		return fmt.Errorf("cache: no encoder configured")
+		return errors.New("cache: no encoder configured")
 	}
 
 	val, err := c.options.encoder(item.Value)

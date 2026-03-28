@@ -9,6 +9,7 @@ import (
 	"github.com/aawadallak/go-core-kit/core/cache"
 	"github.com/aawadallak/go-core-kit/plugin/cache/redis"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRedisProvider(t *testing.T) {
@@ -25,7 +26,7 @@ func TestRedisProvider(t *testing.T) {
 		setup         func(t *testing.T)
 		operation     func(t *testing.T)
 		expectedError error
-		expectedValue interface{}
+		expectedValue any
 		checkResult   bool
 	}{
 		{
@@ -67,7 +68,7 @@ func TestRedisProvider(t *testing.T) {
 			},
 			operation: func(t *testing.T) {
 				err := provider.Delete(ctx, "delete-key")
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				_, err = provider.Get(ctx, "delete-key")
 				assert.ErrorIs(t, err, cache.ErrKeyNotFound)
 			},
@@ -99,7 +100,7 @@ func TestRedisProviderWithCache(t *testing.T) {
 	provider, err := redis.NewProvider(ctx,
 		redis.WithAddress("localhost:6379"),
 	)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer provider.Close(ctx)
 
 	c := cache.New(provider,
@@ -185,7 +186,7 @@ func TestRedisProviderWithCacheResolver_Get(t *testing.T) {
 					ExpiresIn: time.Minute,
 				}
 				err := c.Set(ctx, cItem)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				return cache.NewResolver("test-key-hit",
 					cache.WithCache[Sample](c),
 					cache.WithExpiration[Sample](time.Minute),

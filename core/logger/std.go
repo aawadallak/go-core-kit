@@ -3,6 +3,7 @@ package logger
 import (
 	"fmt"
 	"log"
+	"strings"
 )
 
 // consoleWriter implements the Provider interface for console-based logging
@@ -22,8 +23,9 @@ func initConsoleLogger() Provider {
 func (cw *consoleWriter) Write(rank Level, content string, modifiers ...Option) {
 	config := NewConfig(modifiers...)
 
-	formatStr := "[%s] text=%s"
-	values := []interface{}{
+	var sb strings.Builder
+	sb.WriteString("[%s] text=%s")
+	values := []any{
 		rank.String(),
 		content,
 	}
@@ -31,22 +33,22 @@ func (cw *consoleWriter) Write(rank Level, content string, modifiers ...Option) 
 	for attr, val := range config.Attributes {
 		switch v := val.(type) {
 		case string:
-			formatStr += fmt.Sprintf(" %s=%s", attr, v)
+			sb.WriteString(fmt.Sprintf(" %s=%s", attr, v))
 		case int, int8, int16, int32, int64:
-			formatStr += fmt.Sprintf(" %s=%d", attr, v)
+			sb.WriteString(fmt.Sprintf(" %s=%d", attr, v))
 		case uint, uint8, uint16, uint32, uint64:
-			formatStr += fmt.Sprintf(" %s=%d", attr, v)
+			sb.WriteString(fmt.Sprintf(" %s=%d", attr, v))
 		// TODO: Consider handling complex nested structures
 		default:
 			// Ignore unsupported types
 		}
 	}
 
-	log.Printf(formatStr, values...)
+	log.Printf(sb.String(), values...)
 }
 
 // OutputFormatted writes a formatted message with level prefix
-func (cw *consoleWriter) WriteF(rank Level, layout string, params ...interface{}) {
+func (cw *consoleWriter) WriteF(rank Level, layout string, params ...any) {
 	entry := fmt.Sprintf("[%s] - %s", rank.String(), layout)
 	if len(params) > 0 {
 		log.Printf(entry, params...)

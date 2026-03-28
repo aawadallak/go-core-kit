@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"errors"
 
 	"github.com/aawadallak/go-core-kit/core/cache"
 	"github.com/redis/go-redis/v9"
@@ -16,7 +17,7 @@ var _ cache.Provider = (*cacheProvider)(nil)
 
 func (c *cacheProvider) Get(ctx context.Context, key string) ([]byte, error) {
 	cmd := c.client.Get(ctx, key)
-	if cmd.Err() == redis.Nil {
+	if errors.Is(cmd.Err(), redis.Nil) {
 		return nil, cache.ErrKeyNotFound
 	}
 	if cmd.Err() != nil {
