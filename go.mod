@@ -11,10 +11,12 @@ require (
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/go-resty/resty/v2 v2.17.2
+	github.com/hashicorp/vault/api v1.23.0
 	github.com/lestrrat-go/jwx v1.2.31
 	github.com/nats-io/nats.go v1.50.0
 	github.com/testcontainers/testcontainers-go v0.41.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.41.0
+	github.com/testcontainers/testcontainers-go/modules/vault v0.41.0
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	github.com/wagslane/go-rabbitmq v0.15.0
 	go.opentelemetry.io/otel v1.41.0
@@ -90,7 +92,6 @@ require (
 	github.com/hashicorp/go-secure-stdlib/strutil v0.1.2 // indirect
 	github.com/hashicorp/go-sockaddr v1.0.7 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault-7 // indirect
-	github.com/hashicorp/vault/api v1.23.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.6.0 // indirect
