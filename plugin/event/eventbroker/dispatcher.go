@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/aawadallak/go-core-kit/core/event"
-	brokerjs "github.com/aawadallak/go-core-kit/plugin/broker/natsjetstream"
 )
 
 type Envelope struct {
@@ -21,29 +20,18 @@ type Envelope struct {
 	SpanID        string          `json:"span_id,omitempty"`
 }
 
-type DispatcherConfig struct {
-	Endpoint   string
-	StreamName string
-	Subject    string
-}
-
 type Dispatcher struct {
-	publisher *brokerjs.Publisher
+	transport Transport
+	subject   string
 }
 
 var _ event.Dispatcher = (*Dispatcher)(nil)
 
-func NewDispatcher(ctx context.Context, cfg DispatcherConfig) (*Dispatcher, error) {
-	publisher, err := brokerjs.NewPublisher(ctx, brokerjs.PublisherConfig{
-		Endpoint:   cfg.Endpoint,
-		StreamName: cfg.StreamName,
-		Subject:    cfg.Subject,
-	})
-	if err != nil {
-		return nil, err
+func NewDispatcher(transport Transport, subject string) *Dispatcher {
+	return &Dispatcher{
+		transport: transport,
+		subject:   subject,
 	}
-
-	return &Dispatcher{publisher: publisher}, nil
 }
 
 func (d *Dispatcher) Dispatch(ctx context.Context, evt *event.Record) error {
@@ -59,12 +47,10 @@ func (d *Dispatcher) Dispatch(ctx context.Context, evt *event.Record) error {
 		SpanID:        evt.SpanID,
 	}
 
-	return d.publisher.Publish(ctx, brokerjs.PublishMessage{Message: env})
-}
-
-func (d *Dispatcher) Close() error {
-	if d.publisher == nil {
-		return nil
+	data, err := json.Marshal(env)
+	if err != nil {
+		return err
 	}
-	return d.publisher.Close()
+
+	return d.transport.Publish(ctx, d.subject, data)
 }
