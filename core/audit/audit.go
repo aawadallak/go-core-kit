@@ -7,14 +7,27 @@ import (
 )
 
 type Log struct {
-	Timestamp  time.Time `json:"timestamp"`
-	TraceID    string    `json:"trace_id"`
-	UserID     string    `json:"user_id,omitempty"`
-	Method     string    `json:"method"`
-	Endpoint   string    `json:"endpoint"`
-	StatusCode int       `json:"status_code"`
-	IP         string    `json:"ip"`
-	Signature  string    `json:"signature,omitempty"`
+	Timestamp time.Time      `json:"timestamp"`
+	TraceID   string         `json:"trace_id,omitempty"`
+	UserID    string         `json:"user_id,omitempty"`
+	Action    string         `json:"action"`
+	Metadata  map[string]any `json:"metadata,omitempty"`
+}
+
+// NewHTTPLog creates a Log pre-populated with HTTP-specific metadata.
+func NewHTTPLog(traceID, userID, method, endpoint string, statusCode int, ip string) Log {
+	return Log{
+		Timestamp: time.Now(),
+		TraceID:   traceID,
+		UserID:    userID,
+		Action:    method + " " + endpoint,
+		Metadata: map[string]any{
+			"method":      method,
+			"endpoint":    endpoint,
+			"status_code": statusCode,
+			"ip":          ip,
+		},
+	}
 }
 
 type Provider interface {
