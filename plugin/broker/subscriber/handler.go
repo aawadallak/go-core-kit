@@ -1,3 +1,4 @@
+// Package subscriber provides message subscription handling utilities.
 package subscriber
 
 import (

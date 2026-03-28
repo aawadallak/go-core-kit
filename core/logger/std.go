@@ -33,11 +33,11 @@ func (cw *consoleWriter) Write(rank Level, content string, modifiers ...Option) 
 	for attr, val := range config.Attributes {
 		switch v := val.(type) {
 		case string:
-			sb.WriteString(fmt.Sprintf(" %s=%s", attr, v))
+			fmt.Fprintf(&sb, " %s=%s", attr, v)
 		case int, int8, int16, int32, int64:
-			sb.WriteString(fmt.Sprintf(" %s=%d", attr, v))
+			fmt.Fprintf(&sb, " %s=%d", attr, v)
 		case uint, uint8, uint16, uint32, uint64:
-			sb.WriteString(fmt.Sprintf(" %s=%d", attr, v))
+			fmt.Fprintf(&sb, " %s=%d", attr, v)
 		// TODO: Consider handling complex nested structures
 		default:
 			// Ignore unsupported types

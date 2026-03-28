@@ -1,3 +1,4 @@
+// Package zapx provides a structured logging implementation using zap.
 package zapx
 
 import (
