@@ -5,8 +5,8 @@ import (
 	"context"
 
 	"github.com/aawadallak/go-core-kit/core/repository"
-	"github.com/aawadallak/go-core-kit/core/seal"
 	"github.com/aawadallak/go-core-kit/plugin/abstractrepo"
+	"github.com/aawadallak/go-core-kit/plugin/seal"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/aawadallak/go-core-kit/core/seal"
 	"github.com/aawadallak/go-core-kit/pkg/common"
 
 	"github.com/google/uuid"
@@ -16,17 +15,17 @@ import (
 )
 
 type SealerDependencies struct {
-	RepoSealedMessage seal.SealedMessageRepository
+	RepoSealedMessage SealedMessageRepository
 }
 
 type Sealer struct {
 	deps *SealerDependencies
 }
 
-var _ seal.Sealer = (*Sealer)(nil)
+var _ SealerInterface = (*Sealer)(nil)
 
-func (s *Sealer) Seal(ctx context.Context, in *seal.SealInput) (*seal.SealOutput, error) {
-	entity := &seal.SealedMessage{
+func (s *Sealer) Seal(ctx context.Context, in *SealInput) (*SealOutput, error) {
+	entity := &SealedMessage{
 		Secret: uuid.NewString(),
 	}
 
@@ -64,13 +63,13 @@ func (s *Sealer) Seal(ctx context.Context, in *seal.SealInput) (*seal.SealOutput
 		return nil, common.NewErrInternalServer(err)
 	}
 
-	return &seal.SealOutput{
+	return &SealOutput{
 		Signature: entity.Signature,
 	}, nil
 }
 
-func (s *Sealer) Unseal(ctx context.Context, in *seal.UnsealInput) (*seal.UnsealOutput, error) {
-	sig, err := s.deps.RepoSealedMessage.FindOne(ctx, &seal.SealedMessage{Signature: in.Signature})
+func (s *Sealer) Unseal(ctx context.Context, in *UnsealInput) (*UnsealOutput, error) {
+	sig, err := s.deps.RepoSealedMessage.FindOne(ctx, &SealedMessage{Signature: in.Signature})
 	if err != nil {
 		if errors.Is(err, common.ErrResourceNotFound) {
 			return nil, common.NewErrResourceNotFound(err)
@@ -80,7 +79,7 @@ func (s *Sealer) Unseal(ctx context.Context, in *seal.UnsealInput) (*seal.Unseal
 	}
 
 	if sig.Nonce != 0 {
-		return nil, seal.NewErrUsedSignature()
+		return nil, NewErrUsedSignature()
 	}
 
 	sig.Nonce = time.Now().Unix()
@@ -95,14 +94,14 @@ func (s *Sealer) Unseal(ctx context.Context, in *seal.UnsealInput) (*seal.Unseal
 	}
 
 	if token.Expiration().Before(time.Now()) {
-		return nil, seal.NewErrSealSignatureExpired()
+		return nil, NewErrSealSignatureExpired()
 	}
 
 	if _, err := s.deps.RepoSealedMessage.Update(ctx, sig); err != nil {
 		return nil, common.NewErrInternalServer(err)
 	}
 
-	return &seal.UnsealOutput{
+	return &UnsealOutput{
 		Payload:    sig.Payload,
 		ExternalID: token.Subject(),
 	}, nil
