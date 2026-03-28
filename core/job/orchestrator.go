@@ -8,8 +8,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/aawadallak/go-core-kit/core/logger"
 	"github.com/aawadallak/go-core-kit/common"
+	"github.com/aawadallak/go-core-kit/core/logger"
 )
 
 type Orchestrator struct {
