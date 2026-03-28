@@ -4,8 +4,8 @@ package event
 import (
 	"context"
 
-	cevent "github.com/aawadallak/go-core-kit/core/event"
 	"github.com/aawadallak/go-core-kit/common"
+	cevent "github.com/aawadallak/go-core-kit/core/event"
 	"go.opentelemetry.io/otel/trace"
 )
 
