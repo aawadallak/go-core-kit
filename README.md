@@ -73,6 +73,7 @@ This means your application code depends only on `core/` interfaces. Swap Redis 
 | `plugin/broker/rmq` | [RabbitMQ](https://www.rabbitmq.com) | `core/broker` |
 | `plugin/abstractrepo` | [GORM](https://gorm.io) | `core/repository` |
 | `plugin/conf/ssm` | AWS SSM Parameter Store | `core/conf` |
+| `plugin/conf/vault` | [HashiCorp Vault](https://www.vaultproject.io) | `core/conf` |
 | `plugin/idem/gorm` | GORM/PostgreSQL | `core/idem` |
 | `plugin/idem/inmem` | In-memory | `core/idem` |
 | `plugin/idem/postgres` | PostgreSQL (raw SQL) | `core/idem` |
