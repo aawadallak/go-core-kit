@@ -1,3 +1,4 @@
+// Package msgpack provides MessagePack encoding and decoding for cache values.
 package msgpack
 
 import (

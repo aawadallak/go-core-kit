@@ -71,7 +71,7 @@ func NewConsumer(transport ConsumerTransport, cfg ConsumerConfig) (*Consumer, er
 		subCfg.FetchMaxWait = int(cfg.FetchMaxWait.Seconds())
 	}
 
-	sub, err := transport.Subscribe(context.Background(), subCfg, rawHandler)
+	sub, err := transport.Subscribe(context.Background(), &subCfg, rawHandler)
 	if err != nil {
 		return nil, err
 	}

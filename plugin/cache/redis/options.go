@@ -77,7 +77,7 @@ func WithMinIdleConns(size uint) Option {
 // WithMaxIdleConns sets the maximum number of idle connections option.
 func WithMaxIdleConns(size uint) Option {
 	return func(o *options) {
-		o.redisOptions.MaxIdleConns = int(size)
+		o.redisOptions.MaxIdleConns = int(size) //nolint:gosec // small values
 	}
 }
 

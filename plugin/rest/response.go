@@ -1,3 +1,4 @@
+// Package rest provides HTTP REST server utilities and response helpers.
 package rest
 
 import (

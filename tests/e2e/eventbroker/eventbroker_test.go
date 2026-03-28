@@ -33,7 +33,7 @@ func (m *memTransport) Publish(_ context.Context, subject string, data []byte) e
 	return nil
 }
 
-func (m *memTransport) get(i int) (string, []byte) {
+func (m *memTransport) get(i int) (subject string, data []byte) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return m.messages[i].Subject, m.messages[i].Data
@@ -50,8 +50,8 @@ type testMetadata struct {
 	UserID string `json:"user_id"`
 }
 
-func (t testMetadata) EventType() string  { return "USER_CREATED" }
-func (t testMetadata) EventVersion() int  { return 1 }
+func (t testMetadata) EventType() string { return "USER_CREATED" }
+func (t testMetadata) EventVersion() int { return 1 }
 
 func TestDispatcher_Dispatch(t *testing.T) {
 	transport := &memTransport{}
@@ -88,7 +88,7 @@ func TestDispatcher_MultipleEvents(t *testing.T) {
 	transport := &memTransport{}
 	dispatcher := eventbroker.NewDispatcher(transport, "events.multi")
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		record, err := event.NewRecord(testMetadata{UserID: "u-multi"})
 		require.NoError(t, err)
 		require.NoError(t, dispatcher.Dispatch(context.Background(), record))

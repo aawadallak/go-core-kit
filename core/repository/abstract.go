@@ -1,3 +1,4 @@
+// Package repository provides abstract repository patterns for data access.
 package repository
 
 import "context"

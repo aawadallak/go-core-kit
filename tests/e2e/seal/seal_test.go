@@ -3,8 +3,6 @@ package seal_test
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"testing"
 	"time"
 
@@ -112,8 +110,7 @@ func TestSealUnsealNonceCheck(t *testing.T) {
 	// Second unseal with the same signature should fail with ErrUsedSignature.
 	_, err = svc.Unseal(ctx, &seal.UnsealInput{Signature: sealOut.Signature})
 	require.Error(t, err)
-	assert.True(t, errors.Is(err, seal.ErrUsedSignature),
-		fmt.Sprintf("expected ErrUsedSignature, got: %v", err))
+	assert.ErrorIs(t, err, seal.ErrUsedSignature)
 }
 
 func TestSealUnsealExpired(t *testing.T) {
@@ -141,6 +138,5 @@ func TestSealUnsealExpired(t *testing.T) {
 	// Unseal should fail with ErrSealSignatureExpired.
 	_, err = svc.Unseal(ctx, &seal.UnsealInput{Signature: sealOut.Signature})
 	require.Error(t, err)
-	assert.True(t, errors.Is(err, seal.ErrSealSignatureExpired),
-		fmt.Sprintf("expected ErrSealSignatureExpired, got: %v", err))
+	assert.ErrorIs(t, err, seal.ErrSealSignatureExpired)
 }

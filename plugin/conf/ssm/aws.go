@@ -1,3 +1,4 @@
+// Package ssm provides configuration management using AWS Systems Manager Parameter Store.
 package ssm
 
 import (
