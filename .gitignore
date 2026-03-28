@@ -26,7 +26,6 @@ go.work
 
 # Build artifacts
 bin/
-pkg/
 
 # Temporary files
 *.swp
