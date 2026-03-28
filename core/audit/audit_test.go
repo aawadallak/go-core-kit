@@ -66,8 +66,7 @@ func (s *spyProvider) logs() []Log {
 
 func TestOrchestratorDispatchAndFlush_BatchSize(t *testing.T) {
 	spy := &spyProvider{}
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	orch := NewOrchestrator(ctx,
 		WithBatchSize(2),
@@ -98,11 +97,10 @@ func TestOrchestratorDispatchAndFlush_BatchSize(t *testing.T) {
 
 func TestOrchestratorDispatchAndFlush_Interval(t *testing.T) {
 	spy := &spyProvider{}
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	orch := NewOrchestrator(ctx,
-		WithBatchSize(100),                    // large batch so interval triggers first
+		WithBatchSize(100), // large batch so interval triggers first
 		WithBatchInterval(100*time.Millisecond),
 		WithProvider(spy),
 	)

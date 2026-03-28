@@ -1,3 +1,4 @@
+// Package broker provides messaging abstractions for publishing and subscribing.
 package broker
 
 // Encoder is a function type that converts a Message into a byte slice.

@@ -18,7 +18,7 @@ func TestRedisProvider(t *testing.T) {
 	provider, err := redis.NewProvider(ctx,
 		redis.WithAddress("localhost:6379"),
 	)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer provider.Close(ctx)
 
 	tests := []struct {
@@ -42,7 +42,7 @@ func TestRedisProvider(t *testing.T) {
 			},
 			operation: func(t *testing.T) {
 				value, err := provider.Get(ctx, "test-key")
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, []byte("test-value"), value)
 			},
 			expectedError: nil,
@@ -133,10 +133,10 @@ func TestRedisProviderWithCache(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := c.Set(ctx, tt.item)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			err = c.Get(ctx, tt.item.Key, tt.decodeTo)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tt.expectedValue, *tt.decodeTo)
 		})
 	}
@@ -148,7 +148,7 @@ func TestRedisProviderWithCacheResolver_Get(t *testing.T) {
 	provider, err := redis.NewProvider(ctx,
 		redis.WithAddress("localhost:6379"),
 	)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer provider.Close(ctx)
 
 	c := cache.New(provider,
@@ -205,7 +205,7 @@ func TestRedisProviderWithCacheResolver_Get(t *testing.T) {
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tt.expectedValue, result)
 			}
 		})
@@ -218,7 +218,7 @@ func TestRedisProviderWithCacheResolver(t *testing.T) {
 	provider, err := redis.NewProvider(ctx,
 		redis.WithAddress("localhost:6379"),
 	)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	defer provider.Close(ctx)
 
 	c := cache.New(provider,
@@ -247,7 +247,7 @@ func TestRedisProviderWithCacheResolver(t *testing.T) {
 					ExpiresIn: time.Minute,
 				}
 				err := c.Set(ctx, cItem)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 
 				return cache.NewResolver("test-key",
 					cache.WithCache[Sample](c),
@@ -298,7 +298,7 @@ func TestRedisProviderWithCacheResolver(t *testing.T) {
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tt.expectedValue, result)
 			}
 		})

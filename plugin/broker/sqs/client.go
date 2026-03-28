@@ -1,3 +1,4 @@
+// Package sqs provides an AWS SQS broker implementation.
 package sqs
 
 import (

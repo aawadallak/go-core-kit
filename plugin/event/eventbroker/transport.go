@@ -12,7 +12,7 @@ type Transport interface {
 type ConsumerTransport interface {
 	// Subscribe creates a subscription that delivers raw messages to the handler.
 	// The handler receives the raw bytes; deserialization is done by the caller.
-	Subscribe(ctx context.Context, cfg ConsumerSubscriptionConfig, handler func(ctx context.Context, data []byte) error) (Subscription, error)
+	Subscribe(ctx context.Context, cfg *ConsumerSubscriptionConfig, handler func(ctx context.Context, data []byte) error) (Subscription, error)
 }
 
 // ConsumerSubscriptionConfig carries the parameters needed to create a subscription.

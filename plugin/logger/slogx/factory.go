@@ -1,3 +1,4 @@
+// Package slogx provides a structured logging implementation using slog.
 package slogx
 
 import (

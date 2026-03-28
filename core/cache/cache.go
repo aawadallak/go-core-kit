@@ -1,3 +1,4 @@
+// Package cache provides caching abstractions and utilities.
 package cache
 
 import (

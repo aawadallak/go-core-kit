@@ -1,3 +1,4 @@
+// Package conf provides configuration loading and conversion utilities.
 package conf
 
 import (

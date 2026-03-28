@@ -1,3 +1,4 @@
+// Package worker provides abstractions for background worker management.
 package worker
 
 import (

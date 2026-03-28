@@ -73,7 +73,7 @@ func (t *EventTransport) Publish(ctx context.Context, subject string, data []byt
 // Subscribe implements eventbroker.ConsumerTransport.
 func (t *EventTransport) Subscribe(
 	ctx context.Context,
-	cfg eventbroker.ConsumerSubscriptionConfig,
+	cfg *eventbroker.ConsumerSubscriptionConfig,
 	handler func(ctx context.Context, data []byte) error,
 ) (eventbroker.Subscription, error) {
 	maxDeliver := cfg.MaxDeliver
@@ -237,4 +237,3 @@ func (s *jsSubscription) Close() error {
 	defer s.closeMux.Unlock()
 	return s.closeErr
 }
-
