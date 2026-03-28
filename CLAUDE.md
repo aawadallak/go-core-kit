@@ -27,13 +27,13 @@ make redis-stop     # stop and remove Redis container
 
 The codebase follows a **pkg/core/plugin separation**:
 
-- **`pkg/common/`** — Shared foundation types used across core and plugin packages:
+- **`common/`** — Shared foundation types used across core and plugin packages:
   - `BaseError`, typed HTTP errors (ErrResourceNotFound, ErrInternalServer, etc.)
   - `FailureMode` and `ClassifyFailureMode` for error classification
   - `Entity` — base GORM entity with auto UUID, timestamps, soft delete
   - `MustValidateDependencies` — struct dependency validation
 
-- **`pkg/core/ptr/`** — Pointer utility helpers: `New[T]`, `Now()`, `Safe[T]`
+- **`core/ptr/`** — Pointer utility helpers: `New[T]`, `Now()`, `Safe[T]`
 
 - **`core/`** — Interfaces and abstractions only (no concrete implementations):
   - `logger` — Logger/Provider interfaces with severity levels
@@ -76,5 +76,5 @@ The codebase follows a **pkg/core/plugin separation**:
 - **Context-first** — All public methods take `context.Context` as first parameter
 - **Provider interface** — Core interfaces define a `Provider` for the underlying backend
 - **Factory functions** — `NewProvider()`, `NewLogger()`, etc. for creating implementations
-- **pkg/common.Entity** — Base GORM entity embedded by domain models (job, seal, outbox)
+- **common.Entity** — Base GORM entity embedded by domain models (job, seal, outbox)
 - **Transaction context** — `abstractrepo.WithTx`/`FromContext` propagates GORM transactions via context

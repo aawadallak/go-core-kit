@@ -6,10 +6,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/aawadallak/go-core-kit/pkg/common"
+	"github.com/aawadallak/go-core-kit/common"
 
 	j "github.com/aawadallak/go-core-kit/core/job"
-	"github.com/aawadallak/go-core-kit/pkg/core/ptr"
+	"github.com/aawadallak/go-core-kit/core/ptr"
 	"github.com/aawadallak/go-core-kit/plugin/abstractrepo"
 
 	"gorm.io/gorm"

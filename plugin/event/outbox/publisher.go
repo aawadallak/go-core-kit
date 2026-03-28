@@ -6,7 +6,7 @@ import (
 	"time"
 
 	cevent "github.com/aawadallak/go-core-kit/core/event"
-	"github.com/aawadallak/go-core-kit/pkg/common"
+	"github.com/aawadallak/go-core-kit/common"
 	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/trace"
 )

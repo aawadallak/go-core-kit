@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **`plugin/conf/onepassword`** — 1Password configuration provider using the official SDK, `op://` prefix resolution, and graceful noop fallback.
 - **`plugin/conf/vault`** — HashiCorp Vault configuration provider with KV v1/v2 support, `vault://` prefix resolution, inline mount path override, and graceful noop fallback.
-- **`pkg/common/request_context.go`** — Transport-agnostic `RequestContext` (RequestID, TraceID, SpanID) with context helpers.
+- **`common/request_context.go`** — Transport-agnostic `RequestContext` (RequestID, TraceID, SpanID) with context helpers.
 - **`plugin/cache/msgpack`** — MsgPack encoder/decoder codec for `core/cache` (moved from core to plugin).
 - **`plugin/event/eventbroker/transport.go`** — `Transport` and `ConsumerTransport` interfaces for decoupled event dispatching.
 - **`plugin/broker/natsjetstream/event_transport.go`** — NATS JetStream adapter implementing eventbroker transport interfaces.
@@ -30,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`core/seal`** — Moved to `plugin/seal`. Too app-specific for core (embeds GORM Entity, niche use case). **Breaking.**
 - **`core/identity`** — Removed entirely. User profile model tied to multi-tenant SaaS pattern, not a general infrastructure concern. **Breaking.**
 - **`core/cache/codec_msgpack.go`** — Moved to `plugin/cache/msgpack`. External dependency doesn't belong in core. **Breaking** (import path changed).
-- **`pkg/common/activity.go`** — Removed `ActivityContext` (web-specific). Replaced by `RequestContext`. **Breaking.**
+- **`common/activity.go`** — Removed `ActivityContext` (web-specific). Replaced by `RequestContext`. **Breaking.**
 
 ---
 
@@ -38,8 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (from initial migration)
 
-- **`pkg/common`** — Shared foundation types: `BaseError` with typed HTTP errors (`ErrResourceNotFound`, `ErrInternalServer`, `ErrConflict`, etc.), `FailureMode` classification, `Entity` base model with GORM integration and auto UUID, `MustValidateDependencies` for struct validation.
-- **`pkg/core/ptr`** — Generic pointer helpers: `New[T]`, `Now()`, `Safe[T]`.
+- **`common`** — Shared foundation types: `BaseError` with typed HTTP errors (`ErrResourceNotFound`, `ErrInternalServer`, `ErrConflict`, etc.), `FailureMode` classification, `Entity` base model with GORM integration and auto UUID, `MustValidateDependencies` for struct validation.
+- **`core/ptr`** — Generic pointer helpers: `New[T]`, `Now()`, `Safe[T]`.
 - **`core/audit`** — Batching audit log system with configurable providers and flush intervals.
 - **`core/cipher`** — Cipher interface for hashing/verification strategies.
 - **`core/event`** — Standardized event records with metadata, correlation/trace IDs, and Dispatcher/Publisher interfaces.
@@ -70,7 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **`core/repository.Entity`** now aliases `pkg/common.Entity` with `uint` ID, GORM struct tags, and auto UUID generation via `BeforeCreate` hook (previously `int32` ID without GORM tags).
+- **`core/repository.Entity`** now aliases `common.Entity` with `uint` ID, GORM struct tags, and auto UUID generation via `BeforeCreate` hook (previously `int32` ID without GORM tags).
 - **`plugin/abstractrepo`** replaces `plugin/repository/gorm/v2/abstractrepo` with added transaction context support, optimistic locking, preloads, and configurable soft/hard delete.
 
 ### Removed
