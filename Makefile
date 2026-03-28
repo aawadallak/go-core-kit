@@ -1,8 +1,33 @@
-# Redis configuration
+.PHONY: build test lint fmt tidy redis-local redis-stop
+
+## Development
+
+build:
+	@go build ./...
+
+test:
+	@go test ./core/... ./plugin/txm/... ./pkg/... -race -count=1
+
+test-all:
+	@go test ./... -race -count=1
+
+lint:
+	@golangci-lint run
+
+fmt:
+	@gofmt -w -s .
+
+tidy:
+	@go mod tidy
+
+check: fmt tidy lint test
+	@echo "All checks passed."
+
+## Redis (for local development / integration tests)
+
 REDIS_PORT ?= 6379
 REDIS_CONTAINER_NAME ?= redis-local
 
-# Run Redis locally with Docker
 redis-local:
 	@echo "Starting Redis container..."
 	@docker run --name $(REDIS_CONTAINER_NAME) \
