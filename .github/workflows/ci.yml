@@ -28,7 +28,7 @@ jobs:
         run: go build ./...
 
       - name: Test
-        run: go test ./core/... ./plugin/txm/... ./pkg/... -race -count=1
+        run: go test ./core/... ./common/... ./plugin/txm/... -race -count=1
 
   lint:
     runs-on: ubuntu-latest
