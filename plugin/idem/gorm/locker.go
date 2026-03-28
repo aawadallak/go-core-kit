@@ -1,0 +1,56 @@
+// Package gorm provides gorm functionality.
+package gorm
+
+import (
+	"context"
+	"errors"
+
+	gormpkg "gorm.io/gorm"
+)
+
+type Locker struct {
+	db *gormpkg.DB
+}
+
+func NewLocker(db *gormpkg.DB) (*Locker, error) {
+	if db == nil {
+		return nil, errors.New("gorm locker requires a non-nil db")
+	}
+	return &Locker{db: db}, nil
+}
+
+func (l *Locker) TryLock(ctx context.Context, key string) (acquired bool, release func(context.Context) error, err error) {
+	sqlDB, err := l.db.DB()
+	if err != nil {
+		return false, nil, err
+	}
+
+	conn, err := sqlDB.Conn(ctx)
+	if err != nil {
+		return false, nil, err
+	}
+
+	var locked bool
+	err = conn.QueryRowContext(ctx, "SELECT pg_try_advisory_lock(hashtext($1))", key).Scan(&locked)
+	if err != nil {
+		_ = conn.Close() // best-effort cleanup; query error takes precedence
+		return false, nil, err
+	}
+
+	if !locked {
+		_ = conn.Close() // best-effort cleanup; lock not acquired
+		return false, nil, nil
+	}
+
+	unlock := func(unlockCtx context.Context) error {
+		var unlocked bool
+		err := conn.QueryRowContext(unlockCtx, "SELECT pg_advisory_unlock(hashtext($1))", key).Scan(&unlocked)
+		closeErr := conn.Close()
+		if err != nil {
+			return err
+		}
+		return closeErr
+	}
+
+	return true, unlock, nil
+}
