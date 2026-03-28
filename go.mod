@@ -8,6 +8,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sns v1.34.2
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.1
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.49.2
+	github.com/go-playground/validator/v10 v10.30.1
+	github.com/vmihailenco/msgpack/v5 v5.4.1
 	go.uber.org/zap v1.27.0
 )
 
@@ -67,7 +69,6 @@ require (
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.30.1 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -95,7 +96,6 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
-	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
