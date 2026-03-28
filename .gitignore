@@ -42,3 +42,4 @@ bin/
 # System files
 .DS_Store
 .claude/worktrees/
+docs/superpowers/
