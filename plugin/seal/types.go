@@ -40,7 +40,7 @@ type UnsealOutput struct {
 	ExternalID string
 }
 
-type Sealer interface {
+type SealerInterface interface {
 	Seal(ctx context.Context, in *SealInput) (*SealOutput, error)
 	Unseal(ctx context.Context, in *UnsealInput) (*UnsealOutput, error)
 }
