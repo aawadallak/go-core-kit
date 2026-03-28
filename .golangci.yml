@@ -1,0 +1,119 @@
+version: "2"
+
+run:
+  tests: true
+
+linters:
+  default: none
+  enable:
+    - bodyclose
+    - copyloopvar
+    - dogsled
+    - dupl
+    - errcheck
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - goprintffuncname
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - noctx
+    - nolintlint
+    - prealloc
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
+    - whitespace
+    - errorlint
+    - exhaustive
+    - fatcontext
+    - intrange
+    - modernize
+    - nilerr
+    - perfsprint
+    - protogetter
+    - reassign
+    - spancheck
+    - testifylint
+    - usestdlibvars
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+      exclude-functions:
+        - (*bytes.Buffer).Write
+        - (*bytes.Buffer).WriteString
+        - (*bytes.Buffer).WriteByte
+        - (*bytes.Buffer).WriteRune
+        - (hash.Hash).Write
+        - (*strings.Builder).Write
+        - (*strings.Builder).WriteString
+        - (*strings.Builder).WriteByte
+        - (*strings.Builder).WriteRune
+    goconst:
+      min-len: 2
+      min-occurrences: 2
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+      disabled-checks:
+        - dupImport
+        - ifElseChain
+        - octalLiteral
+        - whyNoLint
+        - wrapperFunc
+    gocyclo:
+      min-complexity: 15
+    misspell:
+      locale: US
+    staticcheck:
+      checks:
+        - all
+        - "-ST1003"
+    exhaustive:
+      default-signifies-exhaustive: true
+    protogetter:
+      skip-any-generated: true
+  exclusions:
+    generated: lax
+    presets:
+      - std-error-handling
+      - common-false-positives
+    rules:
+      - path: _test\.go
+        linters:
+          - errcheck
+          - dupl
+          - gosec
+          - goconst
+          - gocyclo
+      - path: \.pb\.go$
+        linters:
+          - errcheck
+          - dupl
+          - staticcheck
+      - text: "G404: Use of weak random number generator"
+        linters:
+          - gosec
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
