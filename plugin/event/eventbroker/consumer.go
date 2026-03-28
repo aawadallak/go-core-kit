@@ -3,13 +3,12 @@ package eventbroker
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
 	"unicode"
-
-	brokerjs "github.com/aawadallak/go-core-kit/plugin/broker/natsjetstream"
 )
 
 type HandlerFunc func(ctx context.Context, envelope *Envelope) error
@@ -17,7 +16,6 @@ type HandlerFunc func(ctx context.Context, envelope *Envelope) error
 type ConsumerConfig struct {
 	EventName     string
 	Handler       HandlerFunc
-	Endpoint      string
 	StreamName    string
 	Subject       string
 	DurableName   string
@@ -29,45 +27,56 @@ type ConsumerConfig struct {
 }
 
 type Consumer struct {
-	worker *brokerjs.Worker[Envelope]
+	subscription Subscription
 }
 
-func NewConsumer(ctx context.Context, cfg ConsumerConfig) (*Consumer, error) { //nolint:gocritic // hugeParam
+func NewConsumer(transport ConsumerTransport, cfg ConsumerConfig) (*Consumer, error) { //nolint:gocritic // hugeParam
 	if cfg.Handler == nil {
 		return nil, errors.New("consumer handler is required")
 	}
 
 	cfg.DurableName = normalizeConsumerName(cfg.DurableName)
 
-	wrappedHandler := func(ctx context.Context, envelope *Envelope) error {
+	// rawHandler deserialises the envelope and delegates to the configured handler.
+	rawHandler := func(ctx context.Context, data []byte) error {
+		var envelope Envelope
+		if err := json.Unmarshal(data, &envelope); err != nil {
+			return fmt.Errorf("eventbroker: unmarshal envelope: %w", err)
+		}
+
 		if cfg.EventName != "" && envelope.EventName != cfg.EventName {
-			// Different event type: ack and skip.
+			// Different event type: skip.
 			return nil
 		}
 
-		if err := cfg.Handler(ctx, envelope); err != nil {
+		if err := cfg.Handler(ctx, &envelope); err != nil {
 			return fmt.Errorf("event %s handler failed: %w", envelope.EventName, err)
 		}
 		return nil
 	}
 
-	worker, err := brokerjs.NewWorker(ctx, brokerjs.WorkerConfig[Envelope]{
-		Endpoint:      cfg.Endpoint,
+	subCfg := ConsumerSubscriptionConfig{
 		StreamName:    cfg.StreamName,
 		Subject:       cfg.Subject,
 		DurableName:   cfg.DurableName,
 		DLQStreamName: cfg.DLQStreamName,
 		DLQSubject:    cfg.DLQSubject,
 		MaxDeliver:    cfg.MaxDeliver,
-		AckWait:       cfg.AckWait,
-		FetchMaxWait:  cfg.FetchMaxWait,
-		Handler:       wrappedHandler,
-	})
+	}
+
+	if cfg.AckWait > 0 {
+		subCfg.AckWait = int(cfg.AckWait.Seconds())
+	}
+	if cfg.FetchMaxWait > 0 {
+		subCfg.FetchMaxWait = int(cfg.FetchMaxWait.Seconds())
+	}
+
+	sub, err := transport.Subscribe(context.Background(), subCfg, rawHandler)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Consumer{worker: worker}, nil
+	return &Consumer{subscription: sub}, nil
 }
 
 // NATS JetStream consumer names are strict (letters, digits, '_' and '-').
@@ -93,12 +102,12 @@ func normalizeConsumerName(name string) string {
 }
 
 func (c *Consumer) Start(ctx context.Context) {
-	c.worker.Start(ctx)
+	c.subscription.Start(ctx)
 }
 
 func (c *Consumer) Close() error {
-	if c.worker == nil {
+	if c.subscription == nil {
 		return nil
 	}
-	return c.worker.Close()
+	return c.subscription.Close()
 }
