@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`pkg/common/request_context.go`** — Transport-agnostic `RequestContext` (RequestID, TraceID, SpanID) with context helpers.
+- **`plugin/cache/msgpack`** — MsgPack encoder/decoder codec for `core/cache` (moved from core to plugin).
+- **`plugin/event/eventbroker/transport.go`** — `Transport` and `ConsumerTransport` interfaces for decoupled event dispatching.
+- **`plugin/broker/natsjetstream/event_transport.go`** — NATS JetStream adapter implementing eventbroker transport interfaces.
+- **`tests/e2e/seal/`** — End-to-end tests with PostgreSQL testcontainer for seal/unseal flow.
+- **`tests/e2e/eventbroker/`** — End-to-end tests for event dispatching with in-memory transport.
+
+### Changed
+
+- **`core/audit`** — `Log` struct is now transport-agnostic: HTTP-specific fields (`Method`, `Endpoint`, `StatusCode`, `IP`, `Signature`) replaced with generic `Action` (string) and `Metadata` (map[string]any). Added `NewHTTPLog()` convenience constructor. **Breaking.**
+- **`plugin/seal`** — All types moved from `core/seal` into `plugin/seal/types.go`. Seal is now a self-contained plugin, not a core abstraction. **Breaking.**
+- **`plugin/event/eventbroker`** — Dispatcher and consumer now accept `Transport`/`ConsumerTransport` interfaces instead of hard-coded NATS JetStream dependency. **Breaking.**
+- **`plugin/event/publisher.go`** and **`plugin/event/outbox/publisher.go`** — Updated to use `common.RequestContext` instead of removed `ActivityContext`.
+
+### Removed
+
+- **`core/seal`** — Moved to `plugin/seal`. Too app-specific for core (embeds GORM Entity, niche use case). **Breaking.**
+- **`core/identity`** — Removed entirely. User profile model tied to multi-tenant SaaS pattern, not a general infrastructure concern. **Breaking.**
+- **`core/cache/codec_msgpack.go`** — Moved to `plugin/cache/msgpack`. External dependency doesn't belong in core. **Breaking** (import path changed).
+- **`pkg/common/activity.go`** — Removed `ActivityContext` (web-specific). Replaced by `RequestContext`. **Breaking.**
+
+---
+
+## [Initial] - 2026-03-27
+
+### Added (from initial migration)
+
 - **`pkg/common`** — Shared foundation types: `BaseError` with typed HTTP errors (`ErrResourceNotFound`, `ErrInternalServer`, `ErrConflict`, etc.), `FailureMode` classification, `Entity` base model with GORM integration and auto UUID, `MustValidateDependencies` for struct validation.
 - **`pkg/core/ptr`** — Generic pointer helpers: `New[T]`, `Now()`, `Safe[T]`.
 - **`core/audit`** — Batching audit log system with configurable providers and flush intervals.

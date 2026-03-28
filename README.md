@@ -37,7 +37,7 @@ This means your application code depends only on `core/` interfaces. Swap Redis 
 
 | Package | Description |
 |---------|-------------|
-| `pkg/common` | Base entity, typed HTTP errors, failure mode classification, dependency validation |
+| `pkg/common` | Base entity, typed HTTP errors, failure mode classification, request context, dependency validation |
 | `pkg/core/ptr` | Generic pointer helpers: `New[T]`, `Now()`, `Safe[T]` |
 
 ### Core Interfaces (`core/`)
@@ -45,7 +45,7 @@ This means your application code depends only on `core/` interfaces. Swap Redis 
 | Package | Description |
 |---------|-------------|
 | `core/logger` | Structured logging with severity levels and context propagation |
-| `core/cache` | Key-value caching with TTL, codecs (JSON, GZIP, MsgPack), and `Resolver[T]` for cache-or-fetch |
+| `core/cache` | Key-value caching with TTL, codecs (JSON, GZIP), and `Resolver[T]` for cache-or-fetch |
 | `core/broker` | Message publishing and subscribing with pluggable codecs |
 | `core/repository` | Generic `AbstractRepository[T]` and `AbstractPaginatedRepository[T, E]` |
 | `core/conf` | Configuration loading from multiple providers |
@@ -53,11 +53,9 @@ This means your application code depends only on `core/` interfaces. Swap Redis 
 | `core/idem` | Idempotency framework with Manager, Store, Locker, and generic `Handle[T]` |
 | `core/job` | Async job queue with Orchestrator, panic recovery, and graceful shutdown |
 | `core/worker` | Background worker with lifecycle hooks |
-| `core/audit` | Batching audit log system with configurable flush intervals |
+| `core/audit` | Transport-agnostic batching audit log system with generic payload |
 | `core/cipher` | Hashing and verification interface |
 | `core/featureflag` | Feature toggle service with caching and auto-sync |
-| `core/identity` | Request context identity with organization/role support |
-| `core/seal` | Data sealing via signatures with nonce-based replay protection |
 | `core/txm` | Transaction manager interface |
 
 ### Plugin Implementations (`plugin/`)
@@ -67,6 +65,7 @@ This means your application code depends only on `core/` interfaces. Swap Redis 
 | `plugin/logger/zapx` | [Zap](https://github.com/uber-go/zap) | `core/logger` |
 | `plugin/logger/slogx` | `log/slog` | `core/logger` |
 | `plugin/cache/redis` | [go-redis](https://github.com/redis/go-redis) | `core/cache` |
+| `plugin/cache/msgpack` | [msgpack](https://github.com/vmihailenco/msgpack) | `core/cache` codec |
 | `plugin/broker/sqs` | AWS SQS | `core/broker` |
 | `plugin/broker/sns` | AWS SNS | `core/broker` |
 | `plugin/broker/nats` | [NATS](https://nats.io) | `core/broker` |
@@ -80,7 +79,7 @@ This means your application code depends only on `core/` interfaces. Swap Redis 
 | `plugin/event/*` | Outbox, JetStream, HTTP | `core/event` |
 | `plugin/job/jorm` | GORM | `core/job` |
 | `plugin/cipher/bcrypt` | bcrypt | `core/cipher` |
-| `plugin/seal` | JWT (lestrrat-go/jwx) | `core/seal` |
+| `plugin/seal` | JWT (lestrrat-go/jwx) | Data sealing/signatures |
 | `plugin/txm/txmgorm` | GORM | `core/txm` |
 | `plugin/otel` | OpenTelemetry | Tracer/Meter helpers |
 | `plugin/restchi` | [Chi](https://github.com/go-chi/chi) | HTTP server |
