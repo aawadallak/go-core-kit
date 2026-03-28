@@ -37,8 +37,8 @@ This means your application code depends only on `core/` interfaces. Swap Redis 
 
 | Package | Description |
 |---------|-------------|
-| `pkg/common` | Base entity, typed HTTP errors, failure mode classification, request context, dependency validation |
-| `pkg/core/ptr` | Generic pointer helpers: `New[T]`, `Now()`, `Safe[T]` |
+| `common` | Base entity, typed HTTP errors, failure mode classification, request context, dependency validation |
+| `core/ptr` | Generic pointer helpers: `New[T]`, `Now()`, `Safe[T]` |
 
 ### Core Interfaces (`core/`)
 
@@ -121,7 +121,7 @@ func main() {
 package main
 
 import (
-    "github.com/aawadallak/go-core-kit/pkg/common"
+    "github.com/aawadallak/go-core-kit/common"
     "github.com/aawadallak/go-core-kit/plugin/abstractrepo"
     "gorm.io/gorm"
 )

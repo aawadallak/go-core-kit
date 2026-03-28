@@ -7,7 +7,7 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/aawadallak/go-core-kit/pkg/common"
+	"github.com/aawadallak/go-core-kit/common"
 )
 
 var ErrAlreadyInProgress = errors.New("idempotency key already in progress")

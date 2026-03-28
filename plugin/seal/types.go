@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/aawadallak/go-core-kit/common"
 	"github.com/aawadallak/go-core-kit/core/repository"
-	"github.com/aawadallak/go-core-kit/pkg/common"
 )
 
 type SealedMessage struct {

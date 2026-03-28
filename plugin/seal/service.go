@@ -7,7 +7,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/aawadallak/go-core-kit/pkg/common"
+	"github.com/aawadallak/go-core-kit/common"
 
 	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/jwa"

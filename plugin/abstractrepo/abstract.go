@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/aawadallak/go-core-kit/pkg/common"
+	"github.com/aawadallak/go-core-kit/common"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
