@@ -62,7 +62,9 @@ func (o *Orchestrator) Run(ctx context.Context) error {
 				continue
 			}
 
-			o.workers.Go(func() {
+			o.workers.Add(1)
+			go func() {
+				defer o.workers.Done()
 				if o.stopping.Load() {
 					return
 				}
@@ -74,7 +76,7 @@ func (o *Orchestrator) Run(ctx context.Context) error {
 				if err := o.Repo.WithTransaction(ctx, txFn); err != nil {
 					logger.Of(ctx).ErrorS("Failed to process jobs", logger.WithValue("error", err))
 				}
-			})
+			}()
 		}
 	}
 }
