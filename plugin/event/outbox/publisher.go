@@ -40,8 +40,11 @@ func (p *Publisher) Publish(ctx context.Context, metadata cevent.Metadata) error
 		CreatedAt:    time.Now(),
 	}
 
-	activity := common.ActivityFromContext(ctx)
-	entry.RequestID = activity.RequestID
+	if rc := common.RequestContextFrom(ctx); rc != nil {
+		entry.RequestID = rc.RequestID
+		entry.TraceID = rc.TraceID
+		entry.SpanID = rc.SpanID
+	}
 
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {

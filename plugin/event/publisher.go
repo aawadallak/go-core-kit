@@ -21,8 +21,11 @@ func (ep *Publisher) Publish(ctx context.Context, metadata cevent.Metadata) erro
 		return err
 	}
 
-	activity := common.ActivityFromContext(ctx)
-	record.RequestID = activity.RequestID
+	if rc := common.RequestContextFrom(ctx); rc != nil {
+		record.RequestID = rc.RequestID
+		record.TraceID = rc.TraceID
+		record.SpanID = rc.SpanID
+	}
 
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
