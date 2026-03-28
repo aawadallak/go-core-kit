@@ -4,7 +4,9 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/aawadallak/go-core-kit)](https://goreportcard.com/report/github.com/aawadallak/go-core-kit)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-A modular Go toolkit providing production-ready abstractions and pluggable implementations for building backend services. Designed around clean interface boundaries so you can swap implementations without changing application code.
+A modular Go toolkit providing abstractions and pluggable implementations for building backend services. Designed around clean interface boundaries so you can swap implementations without changing application code.
+
+> **Warning:** This project is under active development. APIs may change without notice between versions. Not recommended for production use until a stable `v1.0.0` release. Use at your own risk.
 
 ## Installation
 
