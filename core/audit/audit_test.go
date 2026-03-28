@@ -5,7 +5,15 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/aawadallak/go-core-kit/core/logger"
 )
+
+func TestMain(m *testing.M) {
+	// Init global logger before tests to avoid data race in orchestrator goroutines.
+	logger.SetInstance(logger.New())
+	m.Run()
+}
 
 func TestNewHTTPLog(t *testing.T) {
 	log := NewHTTPLog("trace-1", "user-42", "POST", "/api/items", 201, "10.0.0.1")
