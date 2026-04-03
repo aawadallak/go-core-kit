@@ -74,7 +74,7 @@ func (v *valueMap) GetBoolOrDefault(key string, defaultValue bool) bool {
 
 // GetStringOrDefault retrieves a string value for the given key.
 // Returns the provided default value if the key is not found.
-func (v *valueMap) GetStringOrDefault(key string, defaultValue string) string {
+func (v *valueMap) GetStringOrDefault(key, defaultValue string) string {
 	value, ok := v.get(key)
 	if ok {
 		return value
