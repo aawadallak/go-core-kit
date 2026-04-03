@@ -113,7 +113,8 @@ func (a *Adapter) Verify(hashedValue []byte, value string) error {
 		return fmt.Errorf("argon2: decode hash: %w", err)
 	}
 
-	computed := argon2.IDKey([]byte(value), salt, time, memory, threads, uint32(len(expectedHash)))
+	keyLen := uint32(len(expectedHash)) //nolint:gosec // hash length is bounded by argon2 output, no overflow risk
+	computed := argon2.IDKey([]byte(value), salt, time, memory, threads, keyLen)
 
 	if subtle.ConstantTimeCompare(computed, expectedHash) != 1 {
 		return cipher.NewErrInvalidHash()

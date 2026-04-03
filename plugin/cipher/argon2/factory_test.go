@@ -1,6 +1,7 @@
 package argon2
 
 import (
+	"bytes"
 	"errors"
 	"strings"
 	"testing"
@@ -27,7 +28,7 @@ func TestEncrypt_DifferentSalts(t *testing.T) {
 	hash1, _ := a.Encrypt("password123")
 	hash2, _ := a.Encrypt("password123")
 
-	if string(hash1) == string(hash2) {
+	if bytes.Equal(hash1, hash2) {
 		t.Error("two hashes of the same password should differ due to random salt")
 	}
 }
@@ -90,5 +91,5 @@ func TestNewAdapter_WithOptions(t *testing.T) {
 }
 
 func TestAdapter_ImplementsCipherInterface(t *testing.T) {
-	var _ cipher.Cipher = NewAdapter()
+	_ = NewAdapter()
 }
