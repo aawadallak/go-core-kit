@@ -52,6 +52,46 @@ func (v *valueMap) GetBytes(key string) []byte {
 	return []byte(value)
 }
 
+// GetIntOrDefault retrieves an integer value for the given key.
+// Returns the provided default value if the key is not found.
+func (v *valueMap) GetIntOrDefault(key string, defaultValue int) int {
+	value, ok := v.get(key)
+	if !ok {
+		return defaultValue
+	}
+	return convertToInt(value)
+}
+
+// GetBoolOrDefault retrieves a boolean value for the given key.
+// Returns the provided default value if the key is not found.
+func (v *valueMap) GetBoolOrDefault(key string, defaultValue bool) bool {
+	value, ok := v.get(key)
+	if !ok {
+		return defaultValue
+	}
+	return convertToBool(value)
+}
+
+// GetStringOrDefault retrieves a string value for the given key.
+// Returns the provided default value if the key is not found.
+func (v *valueMap) GetStringOrDefault(key, defaultValue string) string {
+	value, ok := v.get(key)
+	if ok {
+		return value
+	}
+	return defaultValue
+}
+
+// GetBytesOrDefault retrieves a byte slice value for the given key.
+// Returns the provided default value if the key is not found.
+func (v *valueMap) GetBytesOrDefault(key string, defaultValue []byte) []byte {
+	value, ok := v.get(key)
+	if !ok {
+		return defaultValue
+	}
+	return []byte(value)
+}
+
 // MustGetInt retrieves an integer value for the given key.
 // Panics if the key is not found or the value cannot be converted to an integer.
 func (v *valueMap) MustGetInt(key string) int {

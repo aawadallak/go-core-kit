@@ -25,6 +25,22 @@ type ValueMap interface {
 	// Returns nil if the key doesn't exist.
 	GetBytes(key string) []byte
 
+	// GetIntOrDefault returns the integer value associated with the specified key.
+	// Returns the provided default value if the key doesn't exist.
+	GetIntOrDefault(key string, defaultValue int) int
+
+	// GetBoolOrDefault returns the boolean value associated with the specified key.
+	// Returns the provided default value if the key doesn't exist.
+	GetBoolOrDefault(key string, defaultValue bool) bool
+
+	// GetStringOrDefault returns the string value associated with the specified key.
+	// Returns the provided default value if the key doesn't exist.
+	GetStringOrDefault(key string, defaultValue string) string
+
+	// GetBytesOrDefault returns the byte slice value associated with the specified key.
+	// Returns the provided default value if the key doesn't exist.
+	GetBytesOrDefault(key string, defaultValue []byte) []byte
+
 	// MustGetInt returns the integer value for the specified key.
 	// Panics if the key doesn't exist or if conversion to integer fails.
 	MustGetInt(key string) int
